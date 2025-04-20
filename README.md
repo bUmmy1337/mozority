@@ -1,6 +1,6 @@
 
 <p align="center">
-  <a href="https://templecheats.xyz">
+  <a href="https://mozority.pro">
     <img src="github/img/cover.png">
   </a>
 </p> 
@@ -19,7 +19,7 @@
 ### Mozority is an internal cheat for CS2, developed in C++.
 ---
 
-### How to Launch TempleWare
+### How to Launch Mozority
 
 1. **Download the DLL:**
    - Go to the Releases page
