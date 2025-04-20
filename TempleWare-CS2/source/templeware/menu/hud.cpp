@@ -29,7 +29,6 @@ void RenderFovCircle(ImDrawList* drawList, float fov, ImVec2 screenCenter, float
 }
 
 void Hud::render() {
-
     // Time
     std::time_t now = std::time(nullptr);
     std::tm localTime;
@@ -56,7 +55,7 @@ void Hud::render() {
 
     ImDrawList* drawList = ImGui::GetBackgroundDrawList();
 
-    drawList->AddRectFilled(pos, ImVec2(pos.x + rectSize.x, pos.y + rectSize.y), bgColor);
+    //drawList->AddRectFilled(pos, ImVec2(pos.x + rectSize.x, pos.y + rectSize.y), bgColor);
 
     //float lineThickness = 2.0f;
     //drawList->AddLine(pos, ImVec2(pos.x, pos.y + rectSize.y), borderColor, lineThickness);
@@ -65,9 +64,31 @@ void Hud::render() {
     ImVec2 textPos = ImVec2(pos.x + padding, pos.y + padding);
     drawList->AddText(textPos, textColor, watermarkText.c_str());
 
+    // Keybind List (Left-Center)
+    if (Config::show_keybinds) {
+        std::string keybindText = "Keybinds:\n";
+        keybindText += "Aimbot: " + std::string(Config::aimbot ? "ON" : "OFF");
+
+        ImVec2 keybindTextSize = ImGui::CalcTextSize(keybindText.c_str());
+        ImVec2 keybindPos = ImVec2(10, ImGui::GetIO().DisplaySize.y / 2 - keybindTextSize.y / 2);
+        ImVec2 keybindRectSize = ImVec2(keybindTextSize.x + padding * 2, keybindTextSize.y + padding * 2);
+
+        // ÷вета из ApplyImGuiTheme
+        ImU32 keybindBgColor = ImGui::ColorConvertFloat4ToU32(ImVec4(0.96f, 0.96f, 0.96f, 0.85f)); // panelColor с прозрачностью
+        ImU32 keybindBorderColor = ImGui::ColorConvertFloat4ToU32(ImVec4(0.85f, 0.85f, 0.90f, 1.0f)); // accentColor
+        ImU32 keybindTextColor = ImGui::ColorConvertFloat4ToU32(ImVec4(0.15f, 0.15f, 0.15f, 1.0f));   // text
+
+        // —кругление и отрисовка
+        float rounding = 6.0f;
+        drawList->AddRectFilled(keybindPos, ImVec2(keybindPos.x + keybindRectSize.x, keybindPos.y + keybindRectSize.y), keybindBgColor, rounding);
+        drawList->AddRect(keybindPos, ImVec2(keybindPos.x + keybindRectSize.x, keybindPos.y + keybindRectSize.y), keybindBorderColor, rounding, 0, 1.0f);
+
+        ImVec2 keybindTextPos = ImVec2(keybindPos.x + padding, keybindPos.y + padding);
+        drawList->AddText(keybindTextPos, keybindTextColor, keybindText.c_str());
+    }
+
     if (Config::fov_circle) {
         ImVec2 Center = ImVec2(ImGui::GetIO().DisplaySize.x / 2.f, ImGui::GetIO().DisplaySize.y / 2.f);
-
         RenderFovCircle(drawList, Config::aimbot_fov, Center, ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y, 1.f);
     }
 }

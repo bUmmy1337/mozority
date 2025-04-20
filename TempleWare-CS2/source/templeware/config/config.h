@@ -49,4 +49,12 @@ namespace Config {
 	extern ImVec4 fovCircleColor;
 	extern float aimbot_smoothness;
 	extern float aimbot_randomness;
+	extern bool show_keybinds;
+	extern bool radar;
+	static float rcs_scale = 2.0f;
+	extern bool aimbot_multipoint; // New: Enable multipoint aiming
+	extern int aimbot_multipoint_count; // New: Number of bones to target (1-3)
+	extern float aimbot_max_distance;
+	extern bool aimbot_wall_check;
+
 }

@@ -17,4 +17,9 @@ public:
 private:
 	bool showMenu;
 	int activeTab;
+	int aimSubTab;      // Added for Aim sub-functions
+	int visualsSubTab;  // Added for Visuals sub-functions
+	int miscSubTab;     // Added for Misc sub-functions
+	ImFont* smallFont;
+	ImFont* iconFont;
 };

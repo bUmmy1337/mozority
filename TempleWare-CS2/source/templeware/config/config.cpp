@@ -44,10 +44,16 @@ namespace Config {
 	ImVec4 NightColor = ImVec4(0.1, 0.1, 0.1, 1);
 
 	bool aimbot = 0;
+	bool show_keybinds = 1;
 	float aimbot_fov = 0;
 	bool rcs = 0;
 	bool fov_circle = 0;
 	ImVec4 fovCircleColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 	float aimbot_randomness = 0.5f;
 	float aimbot_smoothness = 0.5f;
+	bool radar = false;
+	bool aimbot_multipoint = false; // New: Enable multipoint aiming
+	int aimbot_multipoint_count = 1; // New: Number of bones to target (1-3)
+	float aimbot_max_distance = 3000.0f;
+	bool aimbot_wall_check = true;
 }

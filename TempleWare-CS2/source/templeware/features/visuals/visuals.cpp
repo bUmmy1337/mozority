@@ -9,6 +9,7 @@
 #include "../../interfaces/interfaces.h"
 #include "../../config/config.h"
 #include "../../menu/menu.h"
+#include "spotted.h"
 using namespace Esp;
 
 LocalPlayerCached cached_local;
@@ -134,10 +135,33 @@ void Esp::cache()
         }
     }
 }
+void RunRadarHack(C_CSPlayerPawn* localPawn) {
+    if (!localPawn || !Config::radar) return;
+
+    const int localTeam = localPawn->m_iTeamNum();
+
+    for (const auto& player : cached_players) {
+        if (!player.handle.valid() ||
+            player.health <= 0 ||
+            player.team_num == localTeam) continue;
+
+        if (C_CSPlayerPawn* pawn = I::GameEntity->Instance->Get<C_CSPlayerPawn>(player.handle.index())) {
+            // Устанавливаем флаг spotted
+            *reinterpret_cast<bool*>(reinterpret_cast<uintptr_t>(pawn) + offsets::m_bSpotted) = true;
+
+            // Обновляем маску видимости для нашей команды
+            uint32_t* spottedMask = reinterpret_cast<uint32_t*>(
+                reinterpret_cast<uintptr_t>(pawn) + offsets::m_bSpottedByMask
+                );
+
+            *spottedMask |= (1 << (localTeam % 32)); // Устанавливаем бит нашей команды
+        }
+    }
+}
 
 void Visuals::esp() {
     // Only proceed if at least one ESP component is enabled
-    if (!Config::esp && !Config::showHealth && !Config::espFill && !Config::showNameTags) {
+    if (!Config::esp && !Config::showHealth && !Config::espFill && !Config::showNameTags && !Config::radar) {
         return; // Exit early if no component is enabled
     }
 
@@ -147,16 +171,19 @@ void Visuals::esp() {
         return;
     }
 
+    // Получаем команду локального игрока напрямую
+    int localTeam = localPawn->m_iTeamNum();
+
     if (cached_players.empty())
         return;
 
     for (const auto& Player : cached_players)
     {
-
         if (!Player.handle.valid() || Player.health <= 0 || Player.handle.index() == INVALID_EHANDLE_INDEX)
             continue;
 
-        if (Config::teamCheck && (Player.team_num == cached_local.team))
+        // Проверяем команду напрямую, используя localTeam
+        if (Config::teamCheck && (Player.team_num == localTeam))
             continue;
 
         ImDrawList* drawList = ImGui::GetBackgroundDrawList();
@@ -202,6 +229,7 @@ void Visuals::esp() {
             );
         }
 
+
         // Health Bar
         if (Config::showHealth) {
             int health = Player.health;
@@ -210,12 +238,14 @@ void Visuals::esp() {
             float barX = boxX - (barWidth + 2);
             float barY = boxY + (boxHeight - healthHeight);
 
+            // Фон полоски
             drawList->AddRectFilled(
                 ImVec2(barX, boxY),
                 ImVec2(barX + barWidth, boxY + boxHeight),
                 IM_COL32(70, 70, 70, 255)
             );
 
+            // Заполнение здоровья
             ImU32 healthColor = IM_COL32(
                 static_cast<int>((100 - health) * 2.55f),
                 static_cast<int>(health * 2.55f),
@@ -228,22 +258,32 @@ void Visuals::esp() {
                 healthColor
             );
 
+            // Текст со значением HP
             std::string displayText = "[" + std::to_string(health) + "HP]";
-            ImVec2 textSize = ImGui::CalcTextSize(displayText.c_str());
-            float textX = boxX + (boxWidth - textSize.x) / 2;
-            float textY = boxY + boxHeight + 2;
+            float fontScale = 0.75f;
+            const ImFont* font = ImGui::GetFont();
+            float fontSize = font->FontSize * fontScale;
+            ImVec2 textSize = font->CalcTextSizeA(fontSize, FLT_MAX, 0.0f, displayText.c_str());
+
+            // Сдвигаем текст слева от барa и выравниваем по верхнему краю заливки
+            float textX = barX - textSize.x - 4.0f;
+            float textY = barY;  // именно на уровне верхней границы зелёной полосы
+
+            // Рисуем тень
             drawList->AddText(
+                font, fontSize,
                 ImVec2(textX + 1, textY + 1),
                 IM_COL32(0, 0, 0, 255),
                 displayText.c_str()
             );
+            // И сам текст
             drawList->AddText(
+                font, fontSize,
                 ImVec2(textX, textY),
                 IM_COL32(255, 255, 255, 255),
                 displayText.c_str()
             );
         }
-
         if (Config::showNameTags) {
             std::string playerName = Player.name;
             ImVec2 nameSize = ImGui::CalcTextSize(playerName.c_str());

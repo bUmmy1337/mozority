@@ -6,22 +6,30 @@
 #include "../../../external/imgui/imgui.h"
 #include "../config/config.h"
 
-Keybind::Keybind(bool& v, int k)
-    : var(v), key(k), isListening(false), skipFrame(false) {}
+Keybind::Keybind(bool& v, int k, KeybindMode m)
+    : var(v), key(k), mode(m), isListening(false), skipFrame(false) {
+}
 
 Keybinds::Keybinds() {
-    keybinds.emplace_back(Keybind(Config::aimbot, VK_XBUTTON1));
+    keybinds.emplace_back(Keybind(Config::aimbot, VK_XBUTTON1, KeybindMode::Toggle));
 }
 
 void Keybinds::pollInputs() {
     for (Keybind& k : keybinds) {
-        if (k.key != 0 && (GetAsyncKeyState(k.key) & 0x1)) {
-            k.var = !k.var;
+        if (k.key != 0) {
+            if (k.mode == KeybindMode::Toggle) {
+                if (GetAsyncKeyState(k.key) & 0x0001) {
+                    k.var = !k.var;
+                }
+            }
+            else if (k.mode == KeybindMode::Hold) {
+                k.var = (GetAsyncKeyState(k.key) & 0x8000) != 0;
+            }
         }
     }
 }
 
-void Keybinds::menuButton(bool& var) {
+void Keybinds::menuButton(bool& var, bool renderCombo) {
     for (auto& kb : keybinds) {
         if (&kb.var != &var) continue;
 
@@ -57,7 +65,17 @@ void Keybinds::menuButton(bool& var) {
             ImGui::PushID(&kb);
             ImGui::Text("[%s]", keyName);
             ImGui::SameLine();
-            bool clicked = ImGui::Button("Change##Bind");
+            bool clicked = ImGui::Button("Change##Bind", ImVec2(60, 0));
+            if (renderCombo) {
+                ImGui::SameLine();
+                const char* modes[] = { "Toggle", "Hold" };
+                int current_mode = static_cast<int>(kb.mode);
+                ImGui::PushItemWidth(60);
+                if (ImGui::Combo("Mode", &current_mode, modes, IM_ARRAYSIZE(modes))) {
+                    kb.mode = static_cast<KeybindMode>(current_mode);
+                }
+                ImGui::PopItemWidth();
+            }
             ImGui::PopID();
 
             if (clicked) {
@@ -75,7 +93,7 @@ void Keybinds::menuButton(bool& var) {
             }
 
             if (!kb.skipFrame) {
-                for (int keyCode = 7; keyCode < 256; ++keyCode) {
+                for (int keyCode = 1; keyCode < 256; ++keyCode) {
                     if (GetAsyncKeyState(keyCode) & 0x8000) {
                         kb.key = keyCode;
                         kb.isListening = false;
@@ -90,5 +108,13 @@ void Keybinds::menuButton(bool& var) {
     }
 }
 
+Keybind* Keybinds::getKeybind(bool& var) {
+    for (auto& keybind : keybinds) {
+        if (&keybind.var == &var) {
+            return &keybind;
+        }
+    }
+    return nullptr;
+}
 
 Keybinds keybind;
