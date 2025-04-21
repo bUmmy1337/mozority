@@ -56,4 +56,5 @@ namespace Config {
 	int aimbot_multipoint_count = 1; // New: Number of bones to target (1-3)
 	float aimbot_max_distance = 3000.0f;
 	bool aimbot_wall_check = true;
+
 }

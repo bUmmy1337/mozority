@@ -259,7 +259,7 @@ void Visuals::esp() {
             );
 
             // Текст со значением HP
-            std::string displayText = "[" + std::to_string(health) + "HP]";
+            std::string displayText = "" + std::to_string(health) + "";
             float fontScale = 0.75f;
             const ImFont* font = ImGui::GetFont();
             float fontSize = font->FontSize * fontScale;

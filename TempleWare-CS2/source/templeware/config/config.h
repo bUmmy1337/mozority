@@ -57,4 +57,5 @@ namespace Config {
 	extern float aimbot_max_distance;
 	extern bool aimbot_wall_check;
 
+
 }

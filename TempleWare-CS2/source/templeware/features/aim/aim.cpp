@@ -81,13 +81,11 @@ QAngle_t SmoothAngles(const QAngle_t& current, const QAngle_t& target, float smo
 
     QAngle_t delta = (target - current).Normalize();
 
-
     float distance = delta.Length2D();
     float adjusted_smoothness = smoothness;
     if (initial_activation && distance > 30.0f) {
         adjusted_smoothness *= 2.0f;
     }
-
 
     float smooth_factor = 1.0f - expf(-delta_time / std::max(adjusted_smoothness, 0.01f));
     smooth_factor = clamp(smooth_factor * 15.0f, 0.0f, 1.0f);
@@ -100,77 +98,29 @@ QAngle_t SmoothAngles(const QAngle_t& current, const QAngle_t& target, float smo
     return smoothed.Normalize();
 }
 
-bool IsVisible(const Vector_t& start, const Vector_t& end, const C_CSPlayerPawn* target) {
-    if (!target || !target->getHealth() || target->getHealth() <= 0) {
-        return false;
+bool IsBoneValid(const Vector_t& local_eye_pos, const Vector_t& bone_pos, const QAngle_t& view_angles, float max_distance, float aimbot_fov) {
+    if (bone_pos.IsZero() || !std::isfinite(bone_pos.x) || !std::isfinite(bone_pos.y) || !std::isfinite(bone_pos.z)) return false;
+
+    float distance = (bone_pos - local_eye_pos).Length();
+    if (distance > max_distance) return false;
+
+    QAngle_t angle = CalcAngles(local_eye_pos, bone_pos);
+    if (!angle.IsValid()) return false;
+
+    float fov = GetFov(view_angles, angle);
+    if (fov > aimbot_fov) return false;
+
+    Vector_t delta = bone_pos - local_eye_pos;
+    float height_diff = std::abs(delta.z);
+    if (height_diff > 128.0f && distance < 256.0f) return false;
+
+    if (distance > 0.0f) {
+        Vector_t normalized_dir = delta.Normalize();
+        float dot_product = normalized_dir.z;
+        if (std::abs(dot_product) > 0.9f && height_diff > 64.0f) return false;
     }
 
-    C_CSPlayerPawn* local_player = H::oGetLocalPlayer(0);
-    if (!local_player || local_player->getHealth() <= 0) {
-        return false;
-    }
-
-
-    if (local_player->getTeam() == target->getTeam()) {
-        return false;
-    }
-
-
-    if (!std::isfinite(start.x) || !std::isfinite(start.y) || !std::isfinite(start.z)) {
-        return false;
-    }
-
-
-    const int bones[] = { 6, 5, 4 }; // Bone indices: 6 (head), 5 (neck), 4 (chest)
-    const int bone_count = Config::aimbot_multipoint ? clamp(Config::aimbot_multipoint_count, 1, 3) : 1;
-
-
-    for (int i = 0; i < bone_count; ++i) {
-        int bone_index = bones[i];
-        Vector_t bone_pos = GetBonePosition(target, bone_index);
-
-
-        if (bone_pos.IsZero() || !std::isfinite(bone_pos.x) || !std::isfinite(bone_pos.y) || !std::isfinite(bone_pos.z)) {
-            continue;
-        }
-
-
-        float distance = (bone_pos - start).Length();
-        if (distance > Config::aimbot_max_distance) {
-            continue;
-        }
-
-
-        QAngle_t view_angles = *reinterpret_cast<QAngle_t*>(modules.getModule("client") + 0x1A933C0);
-        QAngle_t angle_to_bone = CalcAngles(start, bone_pos);
-        float fov = GetFov(view_angles, angle_to_bone);
-        if (fov > Config::aimbot_fov) {
-            continue;
-        }
-
-
-        Vector_t delta = bone_pos - start;
-        float height_diff = std::abs(delta.z);
-        if (height_diff > 128.0f && distance < 256.0f) {
-            continue;
-        }
-
-
-        if (distance > 0.0f) {
-            Vector_t normalized_dir = delta.Normalize();
-
-            float dot_product = normalized_dir.x * 0.0f + normalized_dir.y * 0.0f + normalized_dir.z * 1.0f;
-            if (std::abs(dot_product) > 0.9f && height_diff > 64.0f) {
-                continue;
-            }
-        }
-
-
-        return true;
-    }
-
-
-    return false;
+    return true;
 }
 
 void Aimbot() {
@@ -191,17 +141,14 @@ void Aimbot() {
     QAngle_t* view_angles = reinterpret_cast<QAngle_t*>(modules.getModule("client") + 0x1A933C0);
     bool is_attacking = GetAsyncKeyState(VK_LBUTTON) & 0x8000;
 
-
     bool initial_activation = !was_aimbot_enabled && Config::aimbot;
     was_aimbot_enabled = Config::aimbot;
 
-    float best_fov = Config::aimbot_fov;
-    QAngle_t best_angle = *view_angles;
-    bool found_target = false;
-
-    // Define bones for multipoint aiming (head, neck, chest)
     const int bones[] = { 6, 5, 4 }; // Bone indices: 6 (head), 5 (neck), 4 (chest)
     const int bone_count = Config::aimbot_multipoint ? clamp(Config::aimbot_multipoint_count, 1, 3) : 1;
+
+    float min_distance = FLT_MAX;
+    C_CSPlayerPawn* best_player = nullptr;
 
     int max_entities = I::GameEntity->Instance->GetHighestEntityIndex();
     for (int i = 1; i <= max_entities; ++i) {
@@ -221,41 +168,59 @@ void Aimbot() {
             continue;
         }
 
-        // Iterate through selected bones
+        Vector_t player_eye_pos = GetEntityEyePos(pawn);
+        if (player_eye_pos.IsZero()) continue;
+
+        float distance = (player_eye_pos - local_eye_pos).Length();
+
         for (int j = 0; j < bone_count; ++j) {
             int bone_index = bones[j];
             Vector_t bone_pos = GetBonePosition(pawn, bone_index);
-            if (bone_pos.IsZero()) continue;
-
-            // Visibility check: Only apply if wall check is enabled
-            if (Config::aimbot_wall_check && !IsVisible(local_eye_pos, bone_pos, pawn)) continue;
-
-            QAngle_t angle = CalcAngles(local_eye_pos, bone_pos);
-            if (!angle.IsValid()) continue;
-
-            float fov = GetFov(*view_angles, angle);
-            if (!std::isfinite(fov) || fov > best_fov) continue;
-
-            // Recoil compensation
-            if (Config::rcs && is_attacking) {
-                QAngle_t aim_punch = *reinterpret_cast<QAngle_t*>((uintptr_t)local_player + SchemaFinder::Get(hash_32_fnv1a_const("C_CSPlayerPawn->m_aimPunchAngle")));
-                angle -= aim_punch * Config::rcs_scale;
+            if (Config::aimbot_wall_check && !IsBoneValid(local_eye_pos, bone_pos, *view_angles, Config::aimbot_max_distance, Config::aimbot_fov)) {
+                continue;
             }
-
-            best_fov = fov;
-            best_angle = angle;
-            found_target = true;
+            if (distance < min_distance) {
+                min_distance = distance;
+                best_player = pawn;
+                break; // No need to check other bones
+            }
         }
     }
 
-    if (found_target) {
+    if (best_player) {
+        float best_fov = FLT_MAX;
+        QAngle_t best_angle;
 
-        best_angle = SmoothAngles(*view_angles, best_angle, Config::aimbot_smoothness, delta_time, initial_activation);
+        for (int j = 0; j < bone_count; ++j) {
+            int bone_index = bones[j];
+            Vector_t bone_pos = GetBonePosition(best_player, bone_index);
+            if (Config::aimbot_wall_check && !IsBoneValid(local_eye_pos, bone_pos, *view_angles, Config::aimbot_max_distance, Config::aimbot_fov)) {
+                continue;
+            }
+            QAngle_t angle = CalcAngles(local_eye_pos, bone_pos);
+            float fov = GetFov(*view_angles, angle);
+            if (fov < best_fov) {
+                best_fov = fov;
+                best_angle = angle;
+            }
+        }
 
-        best_angle.x = clamp(best_angle.x, -89.0f, 89.0f);
-        best_angle.y = std::fmodf(best_angle.y + 180.0f, 360.0f) - 180.0f;
-        best_angle.z = 0.0f;
+        if (best_fov != FLT_MAX) {
+            // Apply recoil compensation if enabled
+            if (Config::rcs && is_attacking) {
+                QAngle_t aim_punch = *reinterpret_cast<QAngle_t*>((uintptr_t)local_player + SchemaFinder::Get(hash_32_fnv1a_const("C_CSPlayerPawn->m_aimPunchAngle")));
+                best_angle -= aim_punch * Config::rcs_scale;
+            }
 
-        *view_angles = best_angle;
+            // Smooth the angle
+            QAngle_t smoothed_angle = SmoothAngles(*view_angles, best_angle, Config::aimbot_smoothness, delta_time, initial_activation);
+
+            // Clamp and normalize the angle
+            smoothed_angle.x = clamp(smoothed_angle.x, -89.0f, 89.0f);
+            smoothed_angle.y = std::fmodf(smoothed_angle.y + 180.0f, 360.0f) - 180.0f;
+            smoothed_angle.z = 0.0f;
+
+            *view_angles = smoothed_angle;
+        }
     }
 }

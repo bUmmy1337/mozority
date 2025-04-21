@@ -280,7 +280,7 @@ void Menu::render() {
             }
             ImGui::Checkbox("Multipoints", &Config::aimbot_multipoint);
             ImGui::PushItemWidth(180); // Match size of FOV and Smooth sliders
-            ImGui::SliderInt("Multipoint Count", &Config::aimbot_multipoint_count, 1, 30, "%d");
+            ImGui::SliderInt("Multipoint Count", &Config::aimbot_multipoint_count, 1, 3, "%d");
             ImGui::SliderFloat("Max Aim Dist.", &Config::aimbot_max_distance, 250.0f, 10000.0f, "%.0f units");
             ImGui::PopItemWidth();
             ImGui::SameLine();
