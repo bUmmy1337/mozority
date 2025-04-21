@@ -237,11 +237,6 @@
     <ClInclude Include="source\templeware\hooks\includeHooks.h" />
     <ClInclude Include="source\templeware\keybinds\keybinds.h" />
     <ClInclude Include="source\templeware\menu\hud.h" />
-    <ClInclude Include="source\templeware\menu\menu_utils\aimsettings.h" />
-    <ClInclude Include="source\templeware\menu\menu_utils\configs.h" />
-    <ClInclude Include="source\templeware\menu\menu_utils\mmain.h" />
-    <ClInclude Include="source\templeware\menu\menu_utils\stb_image.h" />
-    <ClInclude Include="source\templeware\menu\menu_utils\world.h" />
     <ClInclude Include="source\templeware\offsets\offsets.h" />
     <ClInclude Include="source\templeware\renderer\icons.h" />
     <ClInclude Include="source\templeware\utils\fnv1a\fnv1a.h" />

@@ -5,6 +5,7 @@
 #include "templeware/renderer/icons.h"
 
 #include "../external/kiero/minhook/include/MinHook.h"
+
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 TempleWare templeWare;
@@ -128,9 +129,7 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
                 kiero::bind(8, (void**)&oPresent, hkPresent);
                 init_hook = true;
 
-                // —крываем консоль после успешной инициализации
-                if (const HWND hConsoleWindow = ::GetConsoleWindow(); hConsoleWindow != nullptr)
-                    ::ShowWindow(hConsoleWindow, SW_HIDE);
+                    
             }
         }
     } while (!GetAsyncKeyState(VK_F4));
