@@ -50,7 +50,7 @@ namespace Config {
 	bool fov_circle = 0;
 	ImVec4 fovCircleColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 	float aimbot_randomness = 0.5f;
-	float aimbot_smoothness = 0.5f;
+	float aimbot_smoothness = 2.0f;
 	bool radar = false;
 	bool aimbot_multipoint = false; // New: Enable multipoint aiming
 	int aimbot_multipoint_count = 1; // New: Number of bones to target (1-3)

@@ -129,8 +129,8 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
                 init_hook = true;
 
                 // —крываем консоль после успешной инициализации
-                if (const HWND hConsoleWindow = ::GetConsoleWindow(); hConsoleWindow != nullptr)
-                    ::ShowWindow(hConsoleWindow, SW_HIDE);
+                //if (const HWND hConsoleWindow = ::GetConsoleWindow(); hConsoleWindow != nullptr)
+                    //::ShowWindow(hConsoleWindow, SW_HIDE);
             }
         }
     } while (!GetAsyncKeyState(VK_F4));

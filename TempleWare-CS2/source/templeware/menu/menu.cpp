@@ -255,7 +255,7 @@ void Menu::render() {
             ImGui::PushItemWidth(180);
             ImGui::SliderFloat("FOV", &Config::aimbot_fov, 0.f, 60.f, "%.1f");
             ImGui::Checkbox("Recoil Control", &Config::rcs);
-            ImGui::SliderFloat("Smooth", &Config::aimbot_smoothness, 0.0f, 30.0f, "%.1f");
+            ImGui::SliderFloat("Smooth", &Config::aimbot_smoothness, 2.0f, 30.0f, "%.1f");
             ImGui::PopItemWidth();
             ImGui::EndGroup();
             ImGui::EndChild();
