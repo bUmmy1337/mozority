@@ -15,6 +15,9 @@
   <img src="https://img.shields.io/badge/CS2-5478c7?style=for-the-badge&logo=counter-strike&logoColor=white">
 </p>
 
+> [!CAUTION]
+> USE AT OWN RISK. AT THE MOMENT EVERY CHEAT IN EXISTENCE CAN BE DETECTED
+
 ---
 ### Mozority is an internal cheat for CS2, developed in C++.
 ---
