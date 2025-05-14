@@ -6,9 +6,16 @@
 #include <string>
 #include <sstream>
 #include <DirectXMath.h>
+#include "hudstyle.h"
+#ifdef min
+#undef min
+#endif
+#ifdef max
+#undef max
+#endif
+
 
 Hud::Hud() {
-
 }
 
 float CalculateFovRadius(float fovDegrees, float screenWidth, float screenHeight, float gameVerticalFOV) {
@@ -29,64 +36,97 @@ void RenderFovCircle(ImDrawList* drawList, float fov, ImVec2 screenCenter, float
 }
 
 void Hud::render() {
-    // Time
-    std::time_t now = std::time(nullptr);
-    std::tm localTime;
-    localtime_s(&localTime, &now);
-    char timeBuffer[9];
-    std::strftime(timeBuffer, sizeof(timeBuffer), "", &localTime);
-
-    // FPS
-    float fps = ImGui::GetIO().Framerate;
-    std::ostringstream fpsStream;
-    fpsStream << static_cast<int>(fps) << "";
-
-    // WaterMark
-    std::string watermarkText = "";
-
-    ImVec2 textSize = ImGui::CalcTextSize(watermarkText.c_str());
+    ImDrawList* drawList = ImGui::GetForegroundDrawList();
     float padding = 5.0f;
-    ImVec2 pos = ImVec2(10, 10);
-    ImVec2 rectSize = ImVec2(textSize.x + padding * 2, textSize.y + padding * 2);
 
-    ImU32 bgColor = IM_COL32(50, 50, 50, 200);
-    ImU32 borderColor = IM_COL32(153, 76, 204, 255);
-    ImU32 textColor = IM_COL32(255, 255, 255, 255);
-
-    ImDrawList* drawList = ImGui::GetBackgroundDrawList();
-
-    //drawList->AddRectFilled(pos, ImVec2(pos.x + rectSize.x, pos.y + rectSize.y), bgColor);
-
-    //float lineThickness = 2.0f;
-    //drawList->AddLine(pos, ImVec2(pos.x, pos.y + rectSize.y), borderColor, lineThickness);
-    //drawList->AddLine(ImVec2(pos.x + rectSize.x, pos.y), ImVec2(pos.x + rectSize.x, pos.y + rectSize.y), borderColor, lineThickness);
-
-    ImVec2 textPos = ImVec2(pos.x + padding, pos.y + padding);
-    drawList->AddText(textPos, textColor, watermarkText.c_str());
-
-    // Keybind List (Left-Center)
-    if (Config::show_keybinds) {
-        std::string keybindText = "Keybinds:\n";
-        keybindText += "Aimbot: " + std::string(Config::aimbot ? "ON" : "OFF");
-
-        ImVec2 keybindTextSize = ImGui::CalcTextSize(keybindText.c_str());
-        ImVec2 keybindPos = ImVec2(10, ImGui::GetIO().DisplaySize.y / 2 - keybindTextSize.y / 2);
-        ImVec2 keybindRectSize = ImVec2(keybindTextSize.x + padding * 2, keybindTextSize.y + padding * 2);
-
-        // ÷вета из ApplyImGuiTheme
-        ImU32 keybindBgColor = ImGui::ColorConvertFloat4ToU32(ImVec4(0.96f, 0.96f, 0.96f, 0.85f)); // panelColor с прозрачностью
-        ImU32 keybindBorderColor = ImGui::ColorConvertFloat4ToU32(ImVec4(0.85f, 0.85f, 0.90f, 1.0f)); // accentColor
-        ImU32 keybindTextColor = ImGui::ColorConvertFloat4ToU32(ImVec4(0.15f, 0.15f, 0.15f, 1.0f));   // text
-
-        // —кругление и отрисовка
-        float rounding = 6.0f;
-        drawList->AddRectFilled(keybindPos, ImVec2(keybindPos.x + keybindRectSize.x, keybindPos.y + keybindRectSize.y), keybindBgColor, rounding);
-        drawList->AddRect(keybindPos, ImVec2(keybindPos.x + keybindRectSize.x, keybindPos.y + keybindRectSize.y), keybindBorderColor, rounding, 0, 1.0f);
-
-        ImVec2 keybindTextPos = ImVec2(keybindPos.x + padding, keybindPos.y + padding);
-        drawList->AddText(keybindTextPos, keybindTextColor, keybindText.c_str());
+    // Initialize keybindPos if not set (to center vertically on first render)
+    static bool keybindPosInitialized = false;
+    if (!keybindPosInitialized && Config::show_keybinds) {
+        Config::keybindPos = ImVec2(10.0f, ImGui::GetIO().DisplaySize.y / 2);
+        keybindPosInitialized = true;
     }
 
+    // Static variables for dragging state
+    static bool isDraggingWatermark = false;
+    static bool isDraggingKeybinds = false;
+
+    // Watermark
+    if (Config::show_watermark) {
+        std::string watermarkText = "Mozority | Beta Test";
+        ImVec2 textSize = ImGui::CalcTextSize(watermarkText.c_str());
+        ImVec2 rectSize = ImVec2(textSize.x + padding * 2, textSize.y + padding * 2 + 6.0f); // Extra height for gradient bar
+        ImVec2 pos = Config::watermarkPos;
+
+        // Menu-style rendering
+        ImVec2 mainRectMin = pos;
+        ImVec2 mainRectMax = ImVec2(pos.x + rectSize.x, pos.y + rectSize.y);
+        ImVec2 gradientRectMin = pos;
+        ImVec2 gradientRectMax = ImVec2(pos.x + rectSize.x, pos.y + 6.0f);
+
+        drawList->AddRectFilled(mainRectMin, mainRectMax, mmenu_groupbox_color, 3.0f);
+        drawList->AddRectFilledMultiColor(gradientRectMin, gradientRectMax, mmenu_gradient_left_color, mmenu_gradient_right_color, mmenu_gradient_right_color, mmenu_gradient_left_color);
+        drawList->AddText(segoe_ui_semibold, 14.0f, ImVec2(pos.x + padding, pos.y + padding + 6.0f), mmenu_first_text_color, watermarkText.c_str());
+
+        // Dragging functionality
+        if (ImGui::IsMouseHoveringRect(mainRectMin, mainRectMax)) {
+            if (ImGui::IsMouseClicked(0)) {
+                isDraggingWatermark = true;
+            }
+        }
+        if (isDraggingWatermark && ImGui::IsMouseDragging(0)) {
+            ImVec2 delta = ImGui::GetIO().MouseDelta;
+            Config::watermarkPos.x += delta.x;
+            Config::watermarkPos.y += delta.y;
+
+            // Clamp to screen bounds
+            Config::watermarkPos.x = std::max(0.0f, std::min(Config::watermarkPos.x, ImGui::GetIO().DisplaySize.x - rectSize.x));
+            Config::watermarkPos.y = std::max(0.0f, std::min(Config::watermarkPos.y, ImGui::GetIO().DisplaySize.y - rectSize.y));
+        }
+        if (ImGui::IsMouseReleased(0)) {
+            isDraggingWatermark = false;
+        }
+    }
+
+    // Keybind List
+    if (Config::show_keybinds) {
+        std::string keybindText = "Keybinds\n";
+        keybindText += "Aimbot: " + std::string(Config::aimbot ? "ON" : "OFF");
+
+        ImVec2 textSize = ImGui::CalcTextSize(keybindText.c_str());
+        ImVec2 rectSize = ImVec2(textSize.x + padding * 2, textSize.y + padding * 2 + 6.0f); // Extra height for gradient bar
+        ImVec2 pos = Config::keybindPos;
+
+        // Menu-style rendering
+        ImVec2 mainRectMin = pos;
+        ImVec2 mainRectMax = ImVec2(pos.x + rectSize.x, pos.y + rectSize.y);
+        ImVec2 gradientRectMin = pos;
+        ImVec2 gradientRectMax = ImVec2(pos.x + rectSize.x, pos.y + 6.0f);
+
+        drawList->AddRectFilled(mainRectMin, mainRectMax, mmenu_groupbox_color, 8.0f); // More rounded corners
+        drawList->AddRectFilledMultiColor(gradientRectMin, gradientRectMax, mmenu_gradient_left_color, mmenu_gradient_right_color, mmenu_gradient_right_color, mmenu_gradient_left_color);
+        drawList->AddText(segoe_ui_semibold, 12.0f, ImVec2(pos.x + padding, pos.y + padding + 6.0f), mmenu_first_text_color, keybindText.c_str());
+
+        // Dragging functionality
+        if (ImGui::IsMouseHoveringRect(mainRectMin, mainRectMax)) {
+            if (ImGui::IsMouseClicked(0)) {
+                isDraggingKeybinds = true;
+            }
+        }
+        if (isDraggingKeybinds && ImGui::IsMouseDragging(0)) {
+            ImVec2 delta = ImGui::GetIO().MouseDelta;
+            Config::keybindPos.x += delta.x;
+            Config::keybindPos.y += delta.y;
+
+            // Clamp to screen bounds
+            Config::keybindPos.x = std::max(0.0f, std::min(Config::keybindPos.x, ImGui::GetIO().DisplaySize.x - rectSize.x));
+            Config::keybindPos.y = std::max(0.0f, std::min(Config::keybindPos.y, ImGui::GetIO().DisplaySize.y - rectSize.y));
+        }
+        if (ImGui::IsMouseReleased(0)) {
+            isDraggingKeybinds = false;
+        }
+    }
+
+    // FOV Circle (unchanged)
     if (Config::fov_circle) {
         ImVec2 Center = ImVec2(ImGui::GetIO().DisplaySize.x / 2.f, ImGui::GetIO().DisplaySize.y / 2.f);
         RenderFovCircle(drawList, Config::aimbot_fov, Center, ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y, 1.f);

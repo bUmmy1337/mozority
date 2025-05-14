@@ -56,6 +56,10 @@ namespace Config {
 	extern int aimbot_multipoint_count; // New: Number of bones to target (1-3)
 	extern float aimbot_max_distance;
 	extern bool aimbot_wall_check;
-
+	// New members
+	extern bool show_watermark;
+	extern ImVec2 watermarkPos;
+	extern ImVec2 keybindPos;
+	extern bool BunnyHop;
 
 }

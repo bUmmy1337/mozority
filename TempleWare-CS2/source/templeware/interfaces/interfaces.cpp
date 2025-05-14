@@ -32,9 +32,8 @@ bool I::Interfaces::init()
     );
     success &= (EngineToClient != nullptr);
 
-    // Приводим к IEngineTrace
-    EngineTrace = reinterpret_cast<IEngineTrace*>(EngineToClient);
-    success &= (EngineTrace != nullptr);
+    // EngineTrace = reinterpret_cast<IEngineTrace*>(EngineToClient);
+    // success &= (EngineTrace != nullptr);
 
     // 4 tier0.dll
     ConstructUtlBuffer = reinterpret_cast<decltype(ConstructUtlBuffer)>(
@@ -59,9 +58,16 @@ bool I::Interfaces::init()
         GetProcAddress(tier0_base, "?ConColorMsg@@YAXAEBVColor@@PEBDZZ")
         );
 
+    EngineTrace = reinterpret_cast<IEngineTrace*>(M::FindPattern("client.dll", "4C 8B 3D ? ? ? ? 24 C9 0C 49 66 0F 7F 45 ?"));
+
+    // TraceShape = reinterpret_cast<void(*) (EngineTrace,C_Ray,Vector<int>, Vector<int>, C_TraceFilter , C_GameTrace)>(M::FindPattern("client.dll","E8 ? ? ? ? 80 7D ? ? 75 ? F3 0F 10 45"));
+    // or 
+    TraceShape = reinterpret_cast<decltype(TraceShape)>(M::FindPattern("client.dll", "E8 ? ? ? ? 80 7D ? ? 75 ? F3 0F 10 45"));
+
     // log addresses
     printf("Source2EngineToClient001: 0x%p\n", reinterpret_cast<void*>(EngineToClient));
-    printf("IEngineTrace (from EngineToClient): 0x%p\n", reinterpret_cast<void*>(EngineTrace));
+    printf("IEngineTrace: 0x%p\n", reinterpret_cast<void*>(EngineTrace));
+    printf("TraceShape: 0x%p\n", reinterpret_cast<void*>(TraceShape));
     printf("Source2EngineToClient00: 0x%p\n", reinterpret_cast<void*>(EngineClient));
     printf("GameResourceServiceClientV00: 0x%p\n", reinterpret_cast<void*>(GameEntity));
     printf("CreateMaterial: 0x%p\n", reinterpret_cast<void*>(CreateMaterial));

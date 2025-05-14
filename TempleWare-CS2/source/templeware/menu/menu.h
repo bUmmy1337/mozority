@@ -14,6 +14,9 @@ public:
 	void render();
 
 	void toggleMenu();
+	ID3D11Device* pDevice = nullptr;
+	ID3D11DeviceContext* pContext = nullptr;
+	ID3D11RenderTargetView* mainRenderTargetView = nullptr;
 private:
 	bool showMenu;
 	int activeTab;
@@ -21,5 +24,6 @@ private:
 	int visualsSubTab;  // Added for Visuals sub-functions
 	int miscSubTab;     // Added for Misc sub-functions
 	ImFont* smallFont;
+	ImFont* largeFont;
 	ImFont* iconFont;
 };

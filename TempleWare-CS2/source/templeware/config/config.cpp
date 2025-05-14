@@ -50,11 +50,15 @@ namespace Config {
 	bool fov_circle = 0;
 	ImVec4 fovCircleColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 	float aimbot_randomness = 0.5f;
-	float aimbot_smoothness = 2.0f;
+	float aimbot_smoothness = 0.5f;
 	bool radar = false;
 	bool aimbot_multipoint = false; // New: Enable multipoint aiming
 	int aimbot_multipoint_count = 1; // New: Number of bones to target (1-3)
 	float aimbot_max_distance = 3000.0f;
 	bool aimbot_wall_check = true;
-
+	// New members
+	bool show_watermark = true;
+	ImVec2 watermarkPos = ImVec2(10.0f, 10.0f); // Default top-left corner
+	ImVec2 keybindPos = ImVec2(10.0f, 300.0f); // Default left, fixed vertical position
+	bool BunnyHop = false;
 }

@@ -4,14 +4,16 @@
 #include "../../../templeware/hooks/hooks.h"
 #include "../../../templeware/config/config.h"
 #include "../../utils/math/vector/vector.h"
-#include "../../../templeware/interfaces/IEngineClient/IEngineTrace.h"
 
 #include <chrono>
 #include <Windows.h>
 #include <cmath>
 #include <algorithm>
-#include <iostream>
 
+// Literally the most autistic code ive ever written in my life
+// Please dont ever make me do this again
+
+// Prevent macro interference with min/max
 #ifdef min
 #undef min
 #endif
@@ -20,7 +22,7 @@
 #endif
 
 template<typename T>
-static T clamp(T value, T min_val, T max_val) {
+T clamp(T value, T min_val, T max_val) {
     return std::max(min_val, std::min(max_val, value));
 }
 
@@ -56,21 +58,22 @@ Vector_t GetEntityEyePos(const C_CSPlayerPawn* entity) {
     return result;
 }
 
-static QAngle_t CalcAngles(const Vector_t& src, const Vector_t& dst) {
+QAngle_t CalcAngles(const Vector_t& src, const Vector_t& dst) {
+    QAngle_t angles = { 0, 0, 0 };
     Vector_t delta = dst - src;
-    float hyp = std::sqrt(delta.x * delta.x + delta.y * delta.y);
-    QAngle_t ang{};
+
+    float hyp = delta.Length2D();
     if (hyp > 0.0f) {
-        ang.x = -std::atan2f(delta.z, hyp) * (180.0f / 3.14159265f);
-        ang.y = std::atan2f(delta.y, delta.x) * (180.0f / 3.14159265f);
+        angles.x = -atan2f(delta.z, hyp) * (180.0f / 3.141592654f);
+        angles.y = atan2f(delta.y, delta.x) * (180.0f / 3.141592654f);
     }
-    return ang.Normalize();
+
+    return angles.Normalize();
 }
 
-// разница углов
-static float GetFov(const QAngle_t& view, const QAngle_t& aim) {
-    QAngle_t d = (aim - view).Normalize();
-    return std::sqrt(d.x * d.x + d.y * d.y);
+float GetFov(const QAngle_t& view_angle, const QAngle_t& aim_angle) {
+    QAngle_t delta = (aim_angle - view_angle).Normalize();
+    return delta.Length2D();
 }
 
 QAngle_t SmoothAngles(const QAngle_t& current, const QAngle_t& target, float smoothness, float delta_time, bool initial_activation) {
@@ -78,16 +81,18 @@ QAngle_t SmoothAngles(const QAngle_t& current, const QAngle_t& target, float smo
 
     QAngle_t delta = (target - current).Normalize();
 
+
     float distance = delta.Length2D();
     float adjusted_smoothness = smoothness;
     if (initial_activation && distance > 30.0f) {
         adjusted_smoothness *= 2.0f;
     }
 
+
     float smooth_factor = 1.0f - expf(-delta_time / std::max(adjusted_smoothness, 0.01f));
     smooth_factor = clamp(smooth_factor * 15.0f, 0.0f, 1.0f);
 
-    QAngle_t smoothed;  // Properly declare the smoothed variable
+    QAngle_t smoothed;
     smoothed.x = current.x + delta.x * smooth_factor;
     smoothed.y = current.y + delta.y * smooth_factor;
     smoothed.z = 0.0f;
@@ -95,131 +100,162 @@ QAngle_t SmoothAngles(const QAngle_t& current, const QAngle_t& target, float smo
     return smoothed.Normalize();
 }
 
-
-// Фильтр трассировки, пропускающий локального игрока
-class CTraceFilterSkip {
-public:
-    CTraceFilterSkip(C_CSPlayerPawn* skip) : m_pSkip(skip) {}
-    bool ShouldHitEntity(void* entity, int contentsMask) {
-        return entity != m_pSkip;
-    }
-    unsigned int GetTraceType() const { return 0; }
-private:
-    C_CSPlayerPawn* m_pSkip;
-};
-
-// Упрощённая структура результата (можно расширить поля по CS2 SDK)
-struct trace_t {
-    bool hit;
-    C_CSPlayerPawn* entity;
-    Vector_t endpos;
-    float fraction;
-};
-
-static bool IsVisible(const Vector_t& start, const Vector_t& end, C_CSPlayerPawn* target) {
-    if (!target || target->getHealth() <= 0) return false;
-    C_CSPlayerPawn* local = H::oGetLocalPlayer(0);
-    if (!local || local->getHealth() <= 0) return false;
-    if (local->getTeam() == target->getTeam())    return false;
-    if (!std::isfinite(start.x) || !std::isfinite(start.y) || !std::isfinite(start.z)) return false;
-    if (!std::isfinite(end.x) || !std::isfinite(end.y) || !std::isfinite(end.z))   return false;
-    if (!I::EngineTrace) {
-        std::cout << "[Aim] EngineTrace = nullptr\n";
+bool IsVisible(const Vector_t& start, const Vector_t& end, const C_CSPlayerPawn* target) {
+    if (!target || !target->getHealth() || target->getHealth() <= 0) {
         return false;
     }
 
-    TraceFilter filter{};
-    filter.skipEntity = local;
+    C_CSPlayerPawn* local_player = H::oGetLocalPlayer(0);
+    if (!local_player || local_player->getHealth() <= 0) {
+        return false;
+    }
 
-    TraceResult result{};
-    const unsigned mask = 0x200400B;  // MASK_VISIBLE
-    I::EngineTrace->TraceRay(start, end, mask, &filter, &result);
 
-    return (result.hit && result.entity == target);
+    if (local_player->getTeam() == target->getTeam()) {
+        return false;
+    }
+
+
+    if (!std::isfinite(start.x) || !std::isfinite(start.y) || !std::isfinite(start.z)) {
+        return false;
+    }
+
+
+    const int bones[] = { 7, 6, 5, 4, 3, 0, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 }; // Bone indices: 6 (head), 5 (neck), 4 (chest)
+    const int bone_count = Config::aimbot_multipoint ? clamp(Config::aimbot_multipoint_count, 1, 20) : 1;
+
+
+    for (int i = 0; i < bone_count; ++i) {
+        int bone_index = bones[i];
+        Vector_t bone_pos = GetBonePosition(target, bone_index);
+
+
+        if (bone_pos.IsZero() || !std::isfinite(bone_pos.x) || !std::isfinite(bone_pos.y) || !std::isfinite(bone_pos.z)) {
+            continue;
+        }
+
+
+        float distance = (bone_pos - start).Length();
+        if (distance > Config::aimbot_max_distance) {
+            continue;
+        }
+
+
+        QAngle_t view_angles = *reinterpret_cast<QAngle_t*>(modules.getModule("client") + 0x1A6B2E0); // dwViewAngles
+        QAngle_t angle_to_bone = CalcAngles(start, bone_pos);
+        float fov = GetFov(view_angles, angle_to_bone);
+        if (fov > Config::aimbot_fov) {
+            continue;
+        }
+
+
+        Vector_t delta = bone_pos - start;
+        float height_diff = std::abs(delta.z);
+        if (height_diff > 128.0f && distance < 256.0f) {
+            continue;
+        }
+
+
+        if (distance > 0.0f) {
+            Vector_t normalized_dir = delta.Normalize();
+
+            float dot_product = normalized_dir.x * 0.0f + normalized_dir.y * 0.0f + normalized_dir.z * 1.0f;
+            if (std::abs(dot_product) > 0.9f && height_diff > 64.0f) {
+                continue;
+            }
+        }
+
+
+        return true;
+    }
+
+
+    return false;
 }
+
 void Aimbot() {
     if (!Config::aimbot) return;
-    if (!I::EngineClient || !I::EngineTrace) {
-        std::cout << "[Aim] ERR: EngineClient/EngineTrace null\n";
-        return;
-    }
 
-    // базовые оффсеты для viewAngles
-    uintptr_t clientBase = modules.getModule("client");
-    constexpr ptrdiff_t OFF_VIEWANGLES = 0x1A93300;
-    QAngle_t* viewAnglesPtr = reinterpret_cast<QAngle_t*>(clientBase + OFF_VIEWANGLES);
+    static auto last_time = std::chrono::high_resolution_clock::now();
+    static bool was_aimbot_enabled = false;
+    auto current_time = std::chrono::high_resolution_clock::now();
+    float delta_time = std::chrono::duration<float>(current_time - last_time).count();
+    last_time = current_time;
 
-    C_CSPlayerPawn* local = H::oGetLocalPlayer(0);
-    if (!local || local->getHealth() <= 0) {
-        std::cout << "[Aim] ERR: local invalid/dead\n";
-        return;
-    }
+    delta_time = clamp(delta_time, 0.001f, 0.1f);
 
-    // читаем текущие углы
-    QAngle_t view = *viewAnglesPtr;
-    std::cout << "[Aim] initial view=(" << view.x << "," << view.y << ")\n";
-    std::cout << "[Aim] config.fov=" << Config::aimbot_fov << "\n";
+    C_CSPlayerPawn* local_player = H::oGetLocalPlayer(0);
+    if (!local_player || local_player->getHealth() <= 0) return;
 
-    // позиция глаза
-    Vector_t eye = GetEntityEyePos(local);
+    Vector_t local_eye_pos = GetEntityEyePos(local_player);
+    QAngle_t* view_angles = reinterpret_cast<QAngle_t*>(modules.getModule("client") + 0x1A6B2E0);
+    bool is_attacking = GetAsyncKeyState(VK_LBUTTON) & 0x8000;
 
-    // задаём очень большой FOV для теста (180°)
-    //float bestFov = 180.0f;
-    float bestFov = Config::aimbot_fov; // вернуться к вашему параметру
-    QAngle_t bestAng = view;
-    bool found = false;
 
-    int maxEnt = I::GameEntity->Instance->GetHighestEntityIndex();
-    std::cout << "[Aim] maxEnt=" << maxEnt << "\n";
+    bool initial_activation = !was_aimbot_enabled && Config::aimbot;
+    was_aimbot_enabled = Config::aimbot;
 
-    for (int i = 1; i <= maxEnt; ++i) {
-        auto ent = I::GameEntity->Instance->Get(i);
-        if (!ent) continue;
+    float best_fov = Config::aimbot_fov;
+    QAngle_t best_angle = *view_angles;
+    bool found_target = false;
 
-        SchemaClassInfoData_t* ci = nullptr;
-        ent->dump_class_info(&ci);
-        if (!ci) continue;
-        if (hash_32_fnv1a_const(ci->szName) != hash_32_fnv1a_const("C_CSPlayerPawn"))
+    // Define bones for multipoint aiming (head, neck, chest)
+    const int bones[] = { 6, 5, 4 }; // Bone indices: 6 (head), 5 (neck), 4 (chest)
+    const int bone_count = Config::aimbot_multipoint ? clamp(Config::aimbot_multipoint_count, 1, 3) : 1;
+
+    int max_entities = I::GameEntity->Instance->GetHighestEntityIndex();
+    for (int i = 1; i <= max_entities; ++i) {
+        auto entity = I::GameEntity->Instance->Get(i);
+        if (!entity || !entity->handle().valid()) continue;
+
+        SchemaClassInfoData_t* class_info = nullptr;
+        entity->dump_class_info(&class_info);
+        if (!class_info || hash_32_fnv1a_const(class_info->szName) != hash_32_fnv1a_const("C_CSPlayerPawn")) {
             continue;
-
-        C_CSPlayerPawn* pawn = reinterpret_cast<C_CSPlayerPawn*>(ent);
-        if (pawn == local || pawn->getHealth() <= 0 || pawn->getTeam() == local->getTeam())
-            continue;
-
-        Vector_t targetPos = GetBonePosition(pawn, 6);
-        if (targetPos.IsZero()) continue;
-
-        bool vis = true;
-        if (Config::aimbot_wall_check) {
-            vis = IsVisible(eye, targetPos, pawn);
         }
-        std::cout << "[Aim] Ent#" << i << " vis=" << vis << "\n";
-        if (!vis) continue;
 
-        QAngle_t ang = CalcAngles(eye, targetPos);
-        float fov = GetFov(view, ang);
-        std::cout << "[Aim] cand fov=" << fov << " ang=(" << ang.x << "," << ang.y << ")\n";
+        C_CSPlayerPawn* pawn = reinterpret_cast<C_CSPlayerPawn*>(entity);
+        if (pawn->get_entity_by_handle() == local_player->get_entity_by_handle() ||
+            pawn->getHealth() <= 0 ||
+            pawn->getTeam() == local_player->getTeam()) {
+            continue;
+        }
 
-        if (fov < bestFov) {
-            bestFov = fov;
-            bestAng = ang;
-            found = true;
-            std::cout << "[Aim] new best fov=" << bestFov << "\n";
+        // Iterate through selected bones
+        for (int j = 0; j < bone_count; ++j) {
+            int bone_index = bones[j];
+            Vector_t bone_pos = GetBonePosition(pawn, bone_index);
+            if (bone_pos.IsZero()) continue;
+
+            // Visibility check: Only apply if wall check is enabled
+            if (Config::aimbot_wall_check && !IsVisible(local_eye_pos, bone_pos, pawn)) continue;
+
+            QAngle_t angle = CalcAngles(local_eye_pos, bone_pos);
+            if (!angle.IsValid()) continue;
+
+            float fov = GetFov(*view_angles, angle);
+            if (!std::isfinite(fov) || fov > best_fov) continue;
+
+            // Recoil compensation
+            if (Config::rcs && is_attacking) {
+                QAngle_t aim_punch = *reinterpret_cast<QAngle_t*>((uintptr_t)local_player + SchemaFinder::Get(hash_32_fnv1a_const("C_CSPlayerPawn->m_aimPunchAngle")));
+                angle -= aim_punch * Config::rcs_scale;
+            }
+
+            best_fov = fov;
+            best_angle = angle;
+            found_target = true;
         }
     }
 
-    if (found) {
-        // плавность
-        bestAng = SmoothAngles(view, bestAng, Config::aimbot_smoothness, 1 / 60.0f, true);
-        bestAng.x = clamp(bestAng.x, -89.0f, 89.0f);
-        bestAng.y = std::remainder(bestAng.y, 360.0f);
-        bestAng.z = 0.0f;
+    if (found_target) {
 
-        std::cout << "[Aim] setting angles=(" << bestAng.x << "," << bestAng.y << ")\n";
-        *viewAnglesPtr = bestAng;
+        best_angle = SmoothAngles(*view_angles, best_angle, Config::aimbot_smoothness, delta_time, initial_activation);
 
-        // проверяем, записалось ли:
-        QAngle_t verify = *viewAnglesPtr;
-        std::cout << "[Aim] verify view=(" << verify.x << "," << verify.y << ")\n";
+        best_angle.x = clamp(best_angle.x, -89.0f, 89.0f);
+        best_angle.y = std::fmodf(best_angle.y + 180.0f, 360.0f) - 180.0f;
+        best_angle.z = 0.0f;
+
+        *view_angles = best_angle;
     }
 }
