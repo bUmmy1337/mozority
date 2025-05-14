@@ -45,4 +45,4 @@
 | Description | Image |
 |-------------|-------|
 | **Showcase** | <img src="github/img/ingame.jpg" alt="Showcase" width="600"> |
-| **Menu**     | <img src="github/img/showcase.png" alt="Menu" width="600"> |
+| **Menu**     | <img src="github/img/menu.png" alt="Menu" width="600"> |
