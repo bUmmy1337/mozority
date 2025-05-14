@@ -81,13 +81,11 @@ QAngle_t SmoothAngles(const QAngle_t& current, const QAngle_t& target, float smo
 
     QAngle_t delta = (target - current).Normalize();
 
-
     float distance = delta.Length2D();
     float adjusted_smoothness = smoothness;
     if (initial_activation && distance > 30.0f) {
         adjusted_smoothness *= 2.0f;
     }
-
 
     float smooth_factor = 1.0f - expf(-delta_time / std::max(adjusted_smoothness, 0.01f));
     smooth_factor = clamp(smooth_factor * 15.0f, 0.0f, 1.0f);
@@ -110,36 +108,29 @@ bool IsVisible(const Vector_t& start, const Vector_t& end, const C_CSPlayerPawn*
         return false;
     }
 
-
     if (local_player->getTeam() == target->getTeam()) {
         return false;
     }
-
 
     if (!std::isfinite(start.x) || !std::isfinite(start.y) || !std::isfinite(start.z)) {
         return false;
     }
 
-
     const int bones[] = { 7, 6, 5, 4, 3, 0, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 }; // Bone indices: 6 (head), 5 (neck), 4 (chest)
     const int bone_count = Config::aimbot_multipoint ? clamp(Config::aimbot_multipoint_count, 1, 20) : 1;
-
 
     for (int i = 0; i < bone_count; ++i) {
         int bone_index = bones[i];
         Vector_t bone_pos = GetBonePosition(target, bone_index);
 
-
         if (bone_pos.IsZero() || !std::isfinite(bone_pos.x) || !std::isfinite(bone_pos.y) || !std::isfinite(bone_pos.z)) {
             continue;
         }
-
 
         float distance = (bone_pos - start).Length();
         if (distance > Config::aimbot_max_distance) {
             continue;
         }
-
 
         QAngle_t view_angles = *reinterpret_cast<QAngle_t*>(modules.getModule("client") + 0x1A6B2E0); // dwViewAngles
         QAngle_t angle_to_bone = CalcAngles(start, bone_pos);
@@ -148,13 +139,11 @@ bool IsVisible(const Vector_t& start, const Vector_t& end, const C_CSPlayerPawn*
             continue;
         }
 
-
         Vector_t delta = bone_pos - start;
         float height_diff = std::abs(delta.z);
         if (height_diff > 128.0f && distance < 256.0f) {
             continue;
         }
-
 
         if (distance > 0.0f) {
             Vector_t normalized_dir = delta.Normalize();
@@ -165,12 +154,18 @@ bool IsVisible(const Vector_t& start, const Vector_t& end, const C_CSPlayerPawn*
             }
         }
 
-
         return true;
     }
 
-
     return false;
+}
+
+bool IsSpotted(const C_CSPlayerPawn* pawn) {
+    if (!pawn) return false;
+    static uint32_t spotted_state_offset = SchemaFinder::Get(hash_32_fnv1a_const("C_CSPlayerPawn->m_entitySpottedState"));
+    if (spotted_state_offset == 0) return false;
+    bool spotted = *reinterpret_cast<bool*>((uintptr_t)pawn + spotted_state_offset + 0x8); // m_bSpotted at offset 0x8
+    return spotted;
 }
 
 void Aimbot() {
@@ -190,7 +185,6 @@ void Aimbot() {
     Vector_t local_eye_pos = GetEntityEyePos(local_player);
     QAngle_t* view_angles = reinterpret_cast<QAngle_t*>(modules.getModule("client") + 0x1A6B2E0);
     bool is_attacking = GetAsyncKeyState(VK_LBUTTON) & 0x8000;
-
 
     bool initial_activation = !was_aimbot_enabled && Config::aimbot;
     was_aimbot_enabled = Config::aimbot;
@@ -218,6 +212,10 @@ void Aimbot() {
         if (pawn->get_entity_by_handle() == local_player->get_entity_by_handle() ||
             pawn->getHealth() <= 0 ||
             pawn->getTeam() == local_player->getTeam()) {
+            continue;
+        }
+
+        if (Config::aimbot_wall_check && !IsSpotted(pawn)) {
             continue;
         }
 
@@ -249,7 +247,6 @@ void Aimbot() {
     }
 
     if (found_target) {
-
         best_angle = SmoothAngles(*view_angles, best_angle, Config::aimbot_smoothness, delta_time, initial_activation);
 
         best_angle.x = clamp(best_angle.x, -89.0f, 89.0f);
