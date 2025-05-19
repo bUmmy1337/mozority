@@ -132,7 +132,7 @@ bool IsVisible(const Vector_t& start, const Vector_t& end, const C_CSPlayerPawn*
             continue;
         }
 
-        QAngle_t view_angles = *reinterpret_cast<QAngle_t*>(modules.getModule("client") + 0x1A6B2E0); // dwViewAngles
+        QAngle_t view_angles = *reinterpret_cast<QAngle_t*>(modules.getModule("client") + 0x1A6B2D0); // dwViewAngles
         QAngle_t angle_to_bone = CalcAngles(start, bone_pos);
         float fov = GetFov(view_angles, angle_to_bone);
         if (fov > Config::aimbot_fov) {
@@ -183,7 +183,7 @@ void Aimbot() {
     if (!local_player || local_player->getHealth() <= 0) return;
 
     Vector_t local_eye_pos = GetEntityEyePos(local_player);
-    QAngle_t* view_angles = reinterpret_cast<QAngle_t*>(modules.getModule("client") + 0x1A6B2E0);
+    QAngle_t* view_angles = reinterpret_cast<QAngle_t*>(modules.getModule("client") + 0x1A6B2D0);
     bool is_attacking = GetAsyncKeyState(VK_LBUTTON) & 0x8000;
 
     bool initial_activation = !was_aimbot_enabled && Config::aimbot;
