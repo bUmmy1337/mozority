@@ -30,13 +30,13 @@
    - Click on the .dll file below to download
 
 2. **Inject the DLL:**
-   - Find the `*build-date*.dll` in the `Downloads` folder.
+   - Find the `*mozority_date*.dll` in the `Downloads` folder.
    - Use a DLL injector (e.g., [Extreme Injector](https://github.com/master131/ExtremeInjector)) to inject `*build-date*.dll` into `cs2.exe`.
 
 3. **Play CS2:**
    - Launch `Counter-Strike 2` and start using Mozority.
    - Inject the DLL
-   - Menu Bind `END`
+   - Menu Bind `INSERT`
 
 ---
 
