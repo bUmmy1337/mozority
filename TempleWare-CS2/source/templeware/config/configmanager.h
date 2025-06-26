@@ -156,6 +156,21 @@ namespace internal_config
                 Config::fovCircleColor.w
             };
 
+            // Added missing variables
+            j["showNameTags"] = Config::showNameTags;
+            j["show_keybinds"] = Config::show_keybinds;
+            j["aimbot_randomness"] = Config::aimbot_randomness;
+            j["aimbot_smoothness"] = Config::aimbot_smoothness;
+            j["radar"] = Config::radar;
+            j["aimbot_multipoint"] = Config::aimbot_multipoint;
+            j["aimbot_multipoint_count"] = Config::aimbot_multipoint_count;
+            j["aimbot_max_distance"] = Config::aimbot_max_distance;
+            j["aimbot_wall_check"] = Config::aimbot_wall_check;
+            j["show_watermark"] = Config::show_watermark;
+            j["watermarkPos"] = { Config::watermarkPos.x, Config::watermarkPos.y };
+            j["keybindPos"] = { Config::keybindPos.x, Config::keybindPos.y };
+            j["BunnyHop"] = Config::BunnyHop;
+
             auto filePath = GetConfigPath(configName);
             std::ofstream ofs(filePath);
             if (ofs.is_open())
@@ -284,6 +299,39 @@ namespace internal_config
                 Config::fovCircleColor.z = arr[2].get<float>();
                 Config::fovCircleColor.w = arr[3].get<float>();
             }
+
+            // Added missing variables
+            Config::showNameTags = j.value("showNameTags", false);
+            Config::show_keybinds = j.value("show_keybinds", true);
+            Config::aimbot_randomness = j.value("aimbot_randomness", 0.5f);
+            Config::aimbot_smoothness = j.value("aimbot_smoothness", 0.5f);
+            Config::radar = j.value("radar", false);
+            Config::aimbot_multipoint = j.value("aimbot_multipoint", false);
+            Config::aimbot_multipoint_count = j.value("aimbot_multipoint_count", 1);
+            Config::aimbot_max_distance = j.value("aimbot_max_distance", 3000.0f);
+            Config::aimbot_wall_check = j.value("aimbot_wall_check", true);
+            Config::show_watermark = j.value("show_watermark", true);
+            if (j.contains("watermarkPos") && j["watermarkPos"].is_array() && j["watermarkPos"].size() == 2)
+            {
+                auto arr = j["watermarkPos"];
+                Config::watermarkPos.x = arr[0].get<float>();
+                Config::watermarkPos.y = arr[1].get<float>();
+            }
+            else
+            {
+                Config::watermarkPos = ImVec2(10.0f, 10.0f);
+            }
+            if (j.contains("keybindPos") && j["keybindPos"].is_array() && j["keybindPos"].size() == 2)
+            {
+                auto arr = j["keybindPos"];
+                Config::keybindPos.x = arr[0].get<float>();
+                Config::keybindPos.y = arr[1].get<float>();
+            }
+            else
+            {
+                Config::keybindPos = ImVec2(10.0f, 300.0f);
+            }
+            Config::BunnyHop = j.value("BunnyHop", false);
 
             ifs.close();
         }

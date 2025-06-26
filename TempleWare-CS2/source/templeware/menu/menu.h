@@ -14,9 +14,11 @@ public:
 	void render();
 
 	void toggleMenu();
+	bool& getShowMenu() { return showMenu; }
 	ID3D11Device* pDevice = nullptr;
 	ID3D11DeviceContext* pContext = nullptr;
 	ID3D11RenderTargetView* mainRenderTargetView = nullptr;
+	void handleInsertKeyToggle(); // Объявление метода
 private:
 	bool showMenu;
 	int activeTab;
@@ -26,4 +28,6 @@ private:
 	ImFont* smallFont;
 	ImFont* largeFont;
 	ImFont* iconFont;
+	bool insertKeyPressed = false;
+	bool insertKeyLastState = false;
 };

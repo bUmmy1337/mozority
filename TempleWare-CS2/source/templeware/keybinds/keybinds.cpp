@@ -18,12 +18,16 @@ void Keybinds::pollInputs() {
     for (Keybind& k : keybinds) {
         if (k.key != 0) {
             if (k.mode == KeybindMode::Toggle) {
-                if (GetAsyncKeyState(k.key) & 0x0001) {
+                // Замена на GetKeyState с проверкой предыдущего состояния
+                static bool prevState[256] = { false };
+                bool currentState = (GetKeyState(k.key) & 0x8000) != 0;
+                if (currentState && !prevState[k.key]) {
                     k.var = !k.var;
                 }
+                prevState[k.key] = currentState;
             }
             else if (k.mode == KeybindMode::Hold) {
-                k.var = (GetAsyncKeyState(k.key) & 0x8000) != 0;
+                k.var = (GetKeyState(k.key) & 0x8000) != 0;
             }
         }
     }
@@ -65,7 +69,7 @@ void Keybinds::menuButton(bool& var, bool renderCombo) {
             ImGui::PushID(&kb);
             ImGui::Text("[%s]", keyName);
             ImGui::SameLine();
-            bool clicked = ImGui::Button("Change##Bind", ImVec2(60, 0));
+            bool clicked = ImGui::Button("Bind##Bind", ImVec2(60, 0));
             if (renderCombo) {
                 ImGui::SameLine();
                 const char* modes[] = { "Toggle", "Hold" };

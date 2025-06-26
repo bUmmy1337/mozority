@@ -39,8 +39,8 @@ static const char* const key_str[] = {
 // Colors from onetap_menu.cpp
 ImColor menu_background_outline_color = ImColor(33, 35, 40, 255);
 ImColor menu_background_color = ImColor(45, 48, 55, 255);
-ImColor menu_gradient_left_color = ImColor(200, 110, 45, 255);
-ImColor menu_gradient_right_color = ImColor(255, 185, 100, 255);
+ImColor menu_gradient_left_color = ImColor(230, 230, 230, 255);
+ImColor menu_gradient_right_color = ImColor(218, 218, 218, 255);
 ImColor menu_separator_color = ImColor(62, 68, 78, 255);
 ImColor menu_active_tab_color = ImColor(55, 60, 69, 255);
 ImColor menu_hovered_tab_color = ImColor(50, 55, 62, 255);
@@ -258,84 +258,86 @@ static void CustomColorPicker(const char* label, float col[4]) {
 }
 
 void ApplyImGuiTheme() {
-    ImGui::StyleColorsDark();
     ImGuiStyle& style = ImGui::GetStyle();
     ImVec4* colors = style.Colors;
 
-    // Adapted colors from onetap_menu.cpp
-    colors[ImGuiCol_WindowBg] = ImVec4(45 / 255.0f, 48 / 255.0f, 55 / 255.0f, 1.0f); // menu_background_color
-    colors[ImGuiCol_ChildBg] = ImVec4(50 / 255.0f, 55 / 255.0f, 62 / 255.0f, 1.0f);   // menu_groupbox_color
-    colors[ImGuiCol_PopupBg] = ImVec4(59 / 255.0f, 63 / 255.0f, 72 / 255.0f, 1.0f);  // menu_combobox_background_color
+    // Темная палитра с бело-антарктическим акцентом
+    colors[ImGuiCol_WindowBg] = ImVec4(0.08f, 0.09f, 0.10f, 1.0f); // Очень темно-серый
+    colors[ImGuiCol_ChildBg] = ImVec4(0.10f, 0.11f, 0.12f, 1.0f);   // Чуть светлее
+    colors[ImGuiCol_PopupBg] = ImVec4(0.12f, 0.13f, 0.14f, 1.0f);  // Еще чуть светлее
 
-    colors[ImGuiCol_FrameBg] = ImVec4(33 / 255.0f, 35 / 255.0f, 40 / 255.0f, 1.0f);        // menu_slider_background_color
-    colors[ImGuiCol_FrameBgHovered] = ImVec4(55 / 255.0f, 60 / 255.0f, 69 / 255.0f, 1.0f); // menu_checkbox_hovered_color
-    colors[ImGuiCol_FrameBgActive] = ImVec4(85 / 255.0f, 97 / 255.0f, 119 / 255.0f, 1.0f); // menu_checkbox_color
+    colors[ImGuiCol_FrameBg] = ImVec4(0.15f, 0.16f, 0.17f, 1.0f);        // Темно-серый фон элементов
+    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.20f, 0.21f, 0.22f, 1.0f); // Наведенный фон
+    colors[ImGuiCol_FrameBgActive] = ImVec4(0.30f, 0.40f, 0.50f, 1.0f); // Активный фон (приглушенный голубой акцент)
 
-    colors[ImGuiCol_Text] = ImVec4(214 / 255.0f, 217 / 255.0f, 224 / 255.0f, 1.0f); // menu_first_text_color
-    colors[ImGuiCol_TextDisabled] = ImVec4(189 / 255.0f, 198 / 255.0f, 219 / 255.0f, 1.0f); // menu_second_text_color
-    colors[ImGuiCol_TextSelectedBg] = ImVec4(55 / 255.0f, 60 / 255.0f, 69 / 255.0f, 1.0f);  // menu_active_tab_color
+    colors[ImGuiCol_Text] = ImVec4(0.90f, 0.92f, 0.94f, 1.0f); // Светлый текст
+    colors[ImGuiCol_TextDisabled] = ImVec4(0.60f, 0.65f, 0.70f, 1.0f); // Средне-серый текст
+    colors[ImGuiCol_TextSelectedBg] = ImVec4(0.30f, 0.40f, 0.50f, 0.4f);  // Фон выделенного текста
 
-    colors[ImGuiCol_TitleBg] = ImVec4(45 / 255.0f, 48 / 255.0f, 55 / 255.0f, 1.0f);
-    colors[ImGuiCol_TitleBgActive] = ImVec4(45 / 255.0f, 48 / 255.0f, 55 / 255.0f, 1.0f);
-    colors[ImGuiCol_TitleBgCollapsed] = ImVec4(45 / 255.0f, 48 / 255.0f, 55 / 255.0f, 1.0f);
+    colors[ImGuiCol_TitleBg] = colors[ImGuiCol_WindowBg];
+    colors[ImGuiCol_TitleBgActive] = colors[ImGuiCol_WindowBg];
+    colors[ImGuiCol_TitleBgCollapsed] = colors[ImGuiCol_WindowBg];
 
-    colors[ImGuiCol_Button] = ImVec4(59 / 255.0f, 63 / 255.0f, 72 / 255.0f, 1.0f);    // menu_button_background_color
-    colors[ImGuiCol_ButtonHovered] = ImVec4(79 / 255.0f, 84 / 255.0f, 95 / 255.0f, 1.0f); // menu_button_hovered_color
-    colors[ImGuiCol_ButtonActive] = ImVec4(55 / 255.0f, 60 / 255.0f, 69 / 255.0f, 1.0f);  // menu_active_tab_color
+    colors[ImGuiCol_Button] = ImVec4(0.15f, 0.16f, 0.17f, 1.0f);    // Темно-серые кнопки
+    colors[ImGuiCol_ButtonHovered] = ImVec4(0.20f, 0.21f, 0.22f, 1.0f); // Наведенные кнопки
+    colors[ImGuiCol_ButtonActive] = ImVec4(0.30f, 0.40f, 0.50f, 1.0f);  // Активные кнопки
 
-    colors[ImGuiCol_Tab] = ImVec4(45 / 255.0f, 48 / 255.0f, 55 / 255.0f, 1.0f);         // menu_background_color
-    colors[ImGuiCol_TabHovered] = ImVec4(50 / 255.0f, 55 / 255.0f, 62 / 255.0f, 1.0f);  // menu_hovered_tab_color
-    colors[ImGuiCol_TabActive] = ImVec4(55 / 255.0f, 60 / 255.0f, 69 / 255.0f, 1.0f);   // menu_active_tab_color
-    colors[ImGuiCol_TabUnfocused] = ImVec4(45 / 255.0f, 48 / 255.0f, 55 / 255.0f, 1.0f);
-    colors[ImGuiCol_TabUnfocusedActive] = ImVec4(55 / 255.0f, 60 / 255.0f, 69 / 255.0f, 1.0f);
+    colors[ImGuiCol_Tab] = ImVec4(0.10f, 0.11f, 0.12f, 1.0f);         // Фон табов
+    colors[ImGuiCol_TabHovered] = ImVec4(0.15f, 0.16f, 0.17f, 1.0f);  // Наведенный таб
+    colors[ImGuiCol_TabActive] = ImVec4(0.30f, 0.40f, 0.50f, 1.0f);   // Активный таб (акцент)
+    colors[ImGuiCol_TabUnfocused] = colors[ImGuiCol_Tab];
+    colors[ImGuiCol_TabUnfocusedActive] = colors[ImGuiCol_TabActive];
 
-    colors[ImGuiCol_SliderGrab] = ImVec4(85 / 255.0f, 97 / 255.0f, 119 / 255.0f, 1.0f);  // menu_slider_value_background_color
-    colors[ImGuiCol_SliderGrabActive] = ImVec4(55 / 255.0f, 60 / 255.0f, 69 / 255.0f, 1.0f);
+    colors[ImGuiCol_SliderGrab] = ImVec4(0.30f, 0.40f, 0.50f, 1.0f);  // Акцентный цвет для ползунков
+    colors[ImGuiCol_SliderGrabActive] = ImVec4(0.40f, 0.50f, 0.60f, 1.0f); // Более насыщенный акцент
 
-    colors[ImGuiCol_CheckMark] = ImVec4(85 / 255.0f, 97 / 255.0f, 119 / 255.0f, 1.0f); // menu_checkbox_color
+    colors[ImGuiCol_CheckMark] = ImVec4(0.30f, 0.40f, 0.50f, 1.0f); // Акцентный цвет для чекбоксов
 
-    colors[ImGuiCol_Header] = ImVec4(55 / 255.0f, 60 / 255.0f, 69 / 255.0f, 1.0f);
-    colors[ImGuiCol_HeaderHovered] = ImVec4(50 / 255.0f, 55 / 255.0f, 62 / 255.0f, 1.0f);
-    colors[ImGuiCol_HeaderActive] = ImVec4(55 / 255.0f, 60 / 255.0f, 69 / 255.0f, 1.0f);
+    colors[ImGuiCol_Header] = ImVec4(0.15f, 0.16f, 0.17f, 1.0f); // Заголовки
+    colors[ImGuiCol_HeaderHovered] = ImVec4(0.20f, 0.21f, 0.22f, 1.0f);
+    colors[ImGuiCol_HeaderActive] = ImVec4(0.30f, 0.40f, 0.50f, 1.0f);
 
-    colors[ImGuiCol_Separator] = ImVec4(62 / 255.0f, 68 / 255.0f, 78 / 255.0f, 1.0f); // menu_separator_color
-    colors[ImGuiCol_SeparatorHovered] = ImVec4(50 / 255.0f, 55 / 255.0f, 62 / 255.0f, 1.0f);
-    colors[ImGuiCol_SeparatorActive] = ImVec4(55 / 255.0f, 60 / 255.0f, 69 / 255.0f, 1.0f);
+    colors[ImGuiCol_Separator] = ImVec4(0.15f, 0.16f, 0.17f, 1.0f); // Разделители
+    colors[ImGuiCol_SeparatorHovered] = ImVec4(0.20f, 0.21f, 0.22f, 1.0f);
+    colors[ImGuiCol_SeparatorActive] = ImVec4(0.30f, 0.40f, 0.50f, 1.0f);
 
-    colors[ImGuiCol_Border] = ImVec4(33 / 255.0f, 35 / 255.0f, 40 / 255.0f, 1.0f); // menu_background_outline_color
+    colors[ImGuiCol_Border] = ImVec4(0.0f, 0.0f, 0.0f, 0.0f); // Убираем рамки
     colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
 
-    colors[ImGuiCol_ScrollbarBg] = ImVec4(45 / 255.0f, 48 / 255.0f, 55 / 255.0f, 1.0f);
-    colors[ImGuiCol_ScrollbarGrab] = ImVec4(55 / 255.0f, 60 / 255.0f, 69 / 255.0f, 1.0f);
-    colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(50 / 255.0f, 55 / 255.0f, 62 / 255.0f, 1.0f);
-    colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(55 / 255.0f, 60 / 255.0f, 69 / 255.0f, 1.0f);
+    colors[ImGuiCol_ScrollbarBg] = ImVec4(0.10f, 0.11f, 0.12f, 1.0f);
+    colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.20f, 0.21f, 0.22f, 1.0f);
+    colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.25f, 0.26f, 0.27f, 1.0f);
+    colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.30f, 0.40f, 0.50f, 1.0f);
 
-    colors[ImGuiCol_ModalWindowDimBg] = ImVec4(33 / 255.0f, 35 / 255.0f, 40 / 255.0f, 0.35f);
-    colors[ImGuiCol_NavHighlight] = ImVec4(50 / 255.0f, 55 / 255.0f, 62 / 255.0f, 1.0f);
-    colors[ImGuiCol_DragDropTarget] = ImVec4(55 / 255.0f, 60 / 255.0f, 69 / 255.0f, 1.0f);
+    colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.05f, 0.06f, 0.07f, 0.60f); // Более темный фон модальных окон
+    colors[ImGuiCol_NavHighlight] = ImVec4(0.30f, 0.40f, 0.50f, 1.0f);
+    colors[ImGuiCol_DragDropTarget] = ImVec4(0.30f, 0.40f, 0.50f, 1.0f);
 
-    style.WindowRounding = 3.0f; // Adjusted to match onetap_menu.cpp style
-    style.ChildRounding = 3.0f;
-    style.FrameRounding = 3.0f;
-    style.PopupRounding = 3.0f;
-    style.ScrollbarRounding = 3.0f;
-    style.GrabRounding = 3.0f;
-    style.TabRounding = 3.0f;
+    // Стилизация (оставляем те же значения для скругления и отступов, что и в предыдущем варианте, так как они хорошо подходят для современного вида)
+    style.WindowRounding = 10.0f;
+    style.ChildRounding = 8.0f;
+    style.FrameRounding = 8.0f;
+    style.PopupRounding = 8.0f;
+    style.ScrollbarRounding = 8.0f;
+    style.GrabRounding = 8.0f;
+    style.TabRounding = 8.0f;
 
-    style.WindowBorderSize = 1.0f;
+    style.WindowBorderSize = 0.0f;
     style.ChildBorderSize = 0.0f;
     style.PopupBorderSize = 0.0f;
-    style.FrameBorderSize = 1.0f;
+    style.FrameBorderSize = 0.0f;
     style.TabBorderSize = 0.0f;
 
-    style.ItemSpacing = ImVec2(10, 8);
-    style.ItemInnerSpacing = ImVec2(6, 6);
-    style.FramePadding = ImVec2(8, 6);
-    style.WindowPadding = ImVec2(12, 12);
+    style.ItemSpacing = ImVec2(15, 12);
+    style.ItemInnerSpacing = ImVec2(10, 10);
+    style.FramePadding = ImVec2(12, 10);
+    style.WindowPadding = ImVec2(20, 20);
 
-    style.GrabMinSize = 14.0f;
-    style.ScrollbarSize = 12.0f;
+    style.GrabMinSize = 20.0f;
+    style.ScrollbarSize = 16.0f;
 }
+
+
 
 void Menu::init(HWND& window, ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ID3D11RenderTargetView* mainRenderTargetView) {
     ImGui::CreateContext();
@@ -356,6 +358,22 @@ void Menu::init(HWND& window, ID3D11Device* pDevice, ID3D11DeviceContext* pConte
     std::cout << "initialized menu\n";
 }
 
+void Menu::handleInsertKeyToggle() {
+    bool currentState = (GetAsyncKeyState(VK_INSERT) & 0x8000) != 0;
+
+    if (currentState && !insertKeyLastState) {
+        if (!insertKeyPressed) {
+            this->toggleMenu();
+            insertKeyPressed = true;
+        }
+    }
+    else if (!currentState) {
+        insertKeyPressed = false;
+    }
+
+    insertKeyLastState = currentState;
+}
+
 void Menu::render() {
     keybind.pollInputs();
     if (!showMenu) return;
@@ -367,52 +385,113 @@ void Menu::render() {
     ImGui::Begin(menu_title, nullptr, window_flags);
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(4, 4));
-    ImGui::BeginChild("Sidebar", ImVec2(48, 0), true, ImGuiWindowFlags_NoScrollbar);
+    // Sidebar
+    ImGui::BeginChild("Sidebar", ImVec2(100, 0), true, ImGuiWindowFlags_NoScrollbar);
 
     ImGui::PushFont(largeFont);
-    ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ImGui::CalcTextSize("MZ").x) * 0.5f);
-    ImGui::Text("MZ");
+    ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ImGui::CalcTextSize("mozority").x) * 0.5f);
+    ImGui::TextColored(menu_gradient_right_color, "mozority");
     ImGui::PopFont();
 
     ImGui::PushFont(smallFont);
-    ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ImGui::CalcTextSize("Beta").x) * 0.5f);
-    ImGui::TextDisabled("Beta");
+    ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ImGui::CalcTextSize("open beta").x) * 0.5f);
+    ImGui::TextColored(menu_second_text_color, "open beta");
     ImGui::PopFont();
     ImGui::Separator();
 
-    const char* tabIcons[] = { "A", "V", "M", "C" };
-    const char* tabNames[] = { "Aim", "Visuals", "Misc", "Config" };
-
+    // Основные вкладки
+    const char* mainTabs[] = { "Aim", "Visuals", "Misc", "Config" };
     for (int i = 0; i < 4; i++) {
-        bool isSelected = (activeTab == i);
-        if (isSelected) {
-            ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_TabActive));
-        }
-        if (ImGui::Button(tabIcons[i], ImVec2(40, 40))) {
+        std::string tabText = (activeTab == i) ? ">> " + std::string(mainTabs[i]) : "> " + std::string(mainTabs[i]);
+        ImVec2 posBefore = ImGui::GetCursorScreenPos();
+        if (ImGui::Selectable(tabText.c_str(), activeTab == i, 0, ImVec2(0, 20))) {
             activeTab = i;
         }
-        if (ImGui::IsItemHovered()) {
-            tooltips.push_back({ tabNames[i], tabNames[i], true });
+        if (activeTab == i) {
+            ImVec2 textSize = ImGui::CalcTextSize(tabText.c_str());
+            ImGui::GetWindowDrawList()->AddLine(
+                ImVec2(posBefore.x, posBefore.y + 18),
+                ImVec2(posBefore.x + textSize.x, posBefore.y + 18),
+                IM_COL32(255, 255, 255, 255),
+                2.0f
+            );
         }
-        else {
-            tooltips.push_back({ tabNames[i], tabNames[i], false });
-        }
-        if (isSelected) {
-            ImGui::PopStyleColor();
+        if (activeTab == i) {
+            ImGui::Indent(10.0f);
+            if (i == 0) { // Aim
+                const char* subTabs[] = { "Aimbot", "TriggerBot" };
+                for (int j = 0; j < 2; j++) {
+                    std::string subTabText = (aimSubTab == j) ? ">> " + std::string(subTabs[j]) : "> " + std::string(subTabs[j]);
+                    ImVec2 subPosBefore = ImGui::GetCursorScreenPos();
+                    if (ImGui::Selectable(subTabText.c_str(), aimSubTab == j, 0, ImVec2(0, 20))) {
+                        aimSubTab = j;
+                    }
+                    if (aimSubTab == j) {
+                        ImVec2 subTextSize = ImGui::CalcTextSize(subTabText.c_str());
+                        ImGui::GetWindowDrawList()->AddLine(
+                            ImVec2(subPosBefore.x, subPosBefore.y + 18),
+                            ImVec2(subPosBefore.x + subTextSize.x, subPosBefore.y + 18),
+                            IM_COL32(255, 255, 255, 255),
+                            2.0f
+                        );
+                    }
+                }
+            }
+            else if (i == 1) { // Visuals
+                const char* subTabs[] = { "ESP", "World", "Chams", "Local", "Removals" };
+                for (int j = 0; j < 5; j++) {
+                    std::string subTabText = (visualsSubTab == j) ? ">> " + std::string(subTabs[j]) : "> " + std::string(subTabs[j]);
+                    ImVec2 subPosBefore = ImGui::GetCursorScreenPos();
+                    if (ImGui::Selectable(subTabText.c_str(), visualsSubTab == j, 0, ImVec2(0, 20))) {
+                        visualsSubTab = j;
+                    }
+                    if (visualsSubTab == j) {
+                        ImVec2 subTextSize = ImGui::CalcTextSize(subTabText.c_str());
+                        ImGui::GetWindowDrawList()->AddLine(
+                            ImVec2(subPosBefore.x, subPosBefore.y + 18),
+                            ImVec2(subPosBefore.x + subTextSize.x, subPosBefore.y + 18),
+                            IM_COL32(255, 255, 255, 255),
+                            2.0f
+                        );
+                    }
+                }
+            }
+            else if (i == 2) { // Misc
+                const char* subTabs[] = { "Movement", "Other" };
+                for (int j = 0; j < 2; j++) {
+                    std::string subTabText = (miscSubTab == j) ? ">> " + std::string(subTabs[j]) : "> " + std::string(subTabs[j]);
+                    ImVec2 subPosBefore = ImGui::GetCursorScreenPos();
+                    if (ImGui::Selectable(subTabText.c_str(), miscSubTab == j, 0, ImVec2(0, 20))) {
+                        miscSubTab = j;
+                    }
+                    if (miscSubTab == j) {
+                        ImVec2 subTextSize = ImGui::CalcTextSize(subTabText.c_str());
+                        ImGui::GetWindowDrawList()->AddLine(
+                            ImVec2(subPosBefore.x, subPosBefore.y + 18),
+                            ImVec2(subPosBefore.x + subTextSize.x, subPosBefore.y + 18),
+                            IM_COL32(255, 255, 255, 255),
+                            2.0f
+                        );
+                    }
+                }
+            }
+            ImGui::Unindent(10.0f);
         }
     }
 
     ImGui::SetCursorPosY(ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetStyle().WindowPadding.y);
     ImGui::PushFont(smallFont);
     ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ImGui::CalcTextSize(">.<").x) * 0.5f);
-    ImGui::TextDisabled(">.<");
+    ImGui::TextColored(menu_third_text_color, ">.<");
     ImGui::PopFont();
 
     ImGui::EndChild();
+
     ImGui::PopStyleVar();
 
     ImGui::SameLine();
 
+    // Основное содержимое
     ImGui::BeginChild("MainContent", ImVec2(0, 0), true);
 
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 2));
@@ -424,24 +503,6 @@ void Menu::render() {
 
     switch (activeTab) {
     case 0: // Aim
-    {
-        const char* subTabs[] = { "Aimbot", "TriggerBot" };
-        for (int i = 0; i < 2; i++) {
-            bool isSelected = (aimSubTab == i);
-            if (isSelected) {
-                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_TabActive));
-            }
-            if (ImGui::Button(subTabs[i], ImVec2(80, 30))) {
-                aimSubTab = i;
-            }
-            if (isSelected) {
-                ImGui::PopStyleColor();
-            }
-            if (i < 1) ImGui::SameLine(0, 5);
-        }
-        ImGui::NewLine();
-        ImGui::Separator();
-
         if (aimSubTab == 0) {
             ImGui::Text("Aimbot Settings");
             ImGui::Separator();
@@ -481,9 +542,6 @@ void Menu::render() {
 
             ImGui::BeginChild("RightSection", ImVec2(0, 0), true);
             ImGui::BeginGroup();
-            //ImGui::Checkbox("Wall Check", &Config::aimbot_wall_check);
-            //ImGui::SameLine();
-            //ImGui::TextDisabled("(!)");
             ImGui::Checkbox("Draw FOV Circle", &Config::fov_circle);
             if (Config::fov_circle) {
                 ImGui::SameLine(0, 10);
@@ -498,32 +556,15 @@ void Menu::render() {
             ImGui::EndChild();
         }
         else if (aimSubTab == 1) {
+            ImGui::Text("TriggerBot Settings");
+            ImGui::Separator();
             ImGui::Text("No additional settings");
         }
         break;
-    }
     case 1: // Visuals
-    {
-        const char* subTabs[] = { "ESP", "World", "Chams", "Local", "Removals" };
-        for (int i = 0; i < 5; i++) {
-            bool isSelected = (visualsSubTab == i);
-            if (isSelected) {
-                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_TabActive));
-            }
-            if (ImGui::Button(subTabs[i], ImVec2(80, 30))) {
-                visualsSubTab = i;
-            }
-            if (isSelected) {
-                ImGui::PopStyleColor();
-            }
-            if (i < 4) ImGui::SameLine(0, 5);
-        }
-        ImGui::NewLine();
-        ImGui::Separator();
-
         if (visualsSubTab == 0) {
             ImGui::BeginGroup();
-            ImGui::Text("Box Settings");
+            ImGui::Text("ESP Settings");
             ImGui::Separator();
             ImGui::Checkbox("Box", &Config::esp);
             if (Config::esp) {
@@ -588,7 +629,7 @@ void Menu::render() {
         }
         else if (visualsSubTab == 3) {
             ImGui::BeginGroup();
-            ImGui::Text("Hand Chams Settings");
+            ImGui::Text("Local Settings");
             ImGui::Separator();
             ImGui::Checkbox("Hand Chams##HandChamsCheckbox", &Config::armChams);
             if (Config::armChams) {
@@ -610,27 +651,10 @@ void Menu::render() {
             ImGui::Spacing();
         }
         break;
-    }
     case 2: // Misc
-    {
-        const char* subTabs[] = { "Movement", "Other" };
-        for (int i = 0; i < 2; i++) {
-            bool isSelected = (miscSubTab == i);
-            if (isSelected) {
-                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_TabActive));
-            }
-            if (ImGui::Button(subTabs[i], ImVec2(80, 30))) {
-                miscSubTab = i;
-            }
-            if (isSelected) {
-                ImGui::PopStyleColor();
-            }
-            if (i < 1) ImGui::SameLine(0, 5);
-        }
-        ImGui::NewLine();
-        ImGui::Separator();
-
         if (miscSubTab == 0) {
+            ImGui::Text("Movement Settings");
+            ImGui::Separator();
             ImGui::Text("No additional settings");
         }
         else if (miscSubTab == 1) {
@@ -643,9 +667,7 @@ void Menu::render() {
             ImGui::Spacing();
         }
         break;
-    }
     case 3: // Config
-    {
         static char configName[128] = "";
         static std::vector<std::string> configList = internal_config::ConfigManager::ListConfigs();
         static int selectedConfigIndex = -1;
@@ -681,7 +703,6 @@ void Menu::render() {
         }
         ImGui::EndChild();
         break;
-    }
     }
 
     ImGui::PopStyleColor(3);
