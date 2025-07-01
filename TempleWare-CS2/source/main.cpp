@@ -66,9 +66,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
-    if (GetAsyncKeyState(VK_END) & 1) {
-        templeWare.renderer.menu.toggleMenu();
-    }
+    templeWare.renderer.menu.handleInsertKeyToggle(); // new menu open logic
 
     templeWare.renderer.menu.render();
     templeWare.renderer.hud.render();
@@ -128,7 +126,7 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
                 kiero::bind(8, (void**)&oPresent, hkPresent);
                 init_hook = true;
 
-                // —крываем консоль после успешной инициализации
+                // hide console
                  if (const HWND hConsoleWindow = ::GetConsoleWindow(); hConsoleWindow != nullptr)
                      ::ShowWindow(hConsoleWindow, SW_HIDE);
             }
