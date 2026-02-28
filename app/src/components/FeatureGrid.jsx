@@ -3,42 +3,44 @@ import { motion } from "framer-motion";
 import GlassContainer from "./GlassContainer";
 import { Crosshair, Eye, Paintbrush, Moon, Zap, Move } from "lucide-react";
 
+const IMG_BASE = "https://raw.githubusercontent.com/bUmmy1337/mozority/refs/heads/main/app/public/img";
+
 const features = [
   {
     icon: Paintbrush,
     title: "Skin Changer",
     desc: "Complete inventory replacement — weapons, knives, gloves, agents. Customization of wear, pattern, StatTrak.",
-    img: "/img/skinchanger.png",
+    img: `${IMG_BASE}/skinchanger.png`,
   },
   {
     icon: Eye,
     title: "ESP",
     desc: "Boxes, health bars, player names, real-time previews.",
-    img: "/img/esp.png",
+    img: `${IMG_BASE}/esp.png`,
   },
   {
     icon: Crosshair,
     title: "Aimbot",
     desc: "Configurable aimbot with smoothness. Unsafe feature — must be enabled in settings.",
-    img: "/img/aimbot.png",
+    img: `${IMG_BASE}/aimbot.png`,
   },
   {
     icon: Moon,
     title: "Nightmode",
     desc: "Recoloring world materials (night mode).",
-    img: "/img/nightmode.png",
+    img: `${IMG_BASE}/nightmode.png`,
   },
   {
     icon: Zap,
     title: "Chams",
     desc: "Highlighting player models through walls.",
-    img: "/img/chams.png",
+    img: `${IMG_BASE}/chams.png`,
   },
   {
     icon: Move,
     title: "Movement",
     desc: "BunnyHop and other assists. Also requires enabling unsafe features.",
-    img: "/img/movement.png",
+    img: `${IMG_BASE}/movement.png`,
   },
 ];
 
