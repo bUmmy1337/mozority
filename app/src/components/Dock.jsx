@@ -5,6 +5,7 @@ import {
   Activity,
   Shield,
   Download,
+  User,
 } from "lucide-react";
 
 const links = [
@@ -13,6 +14,7 @@ const links = [
   { icon: Activity, label: "Status", href: "#status" },
   { icon: Shield, label: "Security", href: "#security" },
   { icon: Download, label: "Download", href: "#download" },
+  { icon: User, label: "Cabinet", href: "https://cab.mozority.pro/p/cabinet", external: true },
 ];
 
 export default function Dock() {
@@ -24,10 +26,13 @@ export default function Dock() {
       className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
     >
       <div className="flex items-center gap-1 sm:gap-2 px-4 py-3 rounded-2xl backdrop-blur-[20px] bg-black/40 border border-white/[0.1] shadow-[0_8px_32px_0_rgba(0,0,0,0.8)]">
-        {links.map(({ icon: Icon, label, href }) => (
+        {links.map((link) => {
+          const { icon: Icon, label, href } = link;
+          return (
           <motion.a
             key={label}
             href={href}
+            {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
             whileHover={{ scale: 1.25, y: -4 }}
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 15 }}
@@ -40,7 +45,8 @@ export default function Dock() {
               {label}
             </span>
           </motion.a>
-        ))}
+          );
+        })}
       </div>
     </motion.nav>
   );

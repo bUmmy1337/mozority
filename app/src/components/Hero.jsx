@@ -29,19 +29,36 @@ export default function Hero() {
         Precision. Stealth. Performance.
       </motion.p>
 
-      <motion.a
-        href="#features"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ ...spring, delay: 0.6 }}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.97 }}
-        className="relative mt-10 inline-flex items-center px-8 py-3.5 rounded-full bg-white/[0.08] border border-white/[0.12] text-white font-medium overflow-hidden group cursor-pointer backdrop-blur-sm"
-      >
-        {/* Sliding sheen */}
-        <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-        <span className="relative z-10">Get Access</span>
-      </motion.a>
+      <div className="flex items-center gap-4 mt-10">
+        <motion.a
+          href="https://cab.mozority.pro/p/cabinet"
+          target="_blank"
+          rel="noopener noreferrer"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ ...spring, delay: 0.6 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.97 }}
+          className="relative inline-flex items-center px-8 py-3.5 rounded-full bg-white/[0.08] border border-white/[0.12] text-white font-medium overflow-hidden group cursor-pointer backdrop-blur-sm"
+        >
+          <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+          <span className="relative z-10">Get Access</span>
+        </motion.a>
+
+        <motion.a
+          href="https://cab.mozority.pro/p/cabinet"
+          target="_blank"
+          rel="noopener noreferrer"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ ...spring, delay: 0.75 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.97 }}
+          className="inline-flex items-center px-6 py-3.5 rounded-full text-white/50 font-medium hover:text-white/80 transition-colors cursor-pointer"
+        >
+          Cabinet &rarr;
+        </motion.a>
+      </div>
 
       {/* Scroll indicator */}
       <motion.div
