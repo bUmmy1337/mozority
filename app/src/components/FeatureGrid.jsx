@@ -1,37 +1,37 @@
 import { motion } from "framer-motion";
 import GlassContainer from "./GlassContainer";
-import { Crosshair, Eye, Radar, Box, ScanLine, Orbit } from "lucide-react";
+import { Crosshair, Eye, Paintbrush, Moon, Zap, Move } from "lucide-react";
 
 const features = [
   {
-    icon: Crosshair,
-    title: "Aimbot",
-    desc: "Precision targeting with smooth, humanized aim assist. Configurable FOV, smoothing, and bone priority.",
+    icon: Paintbrush,
+    title: "Skin Changer",
+    desc: "Complete inventory replacement — weapons, knives, gloves, agents. Customization of wear, pattern, StatTrak.",
   },
   {
     icon: Eye,
-    title: "ESP / Wallhack",
-    desc: "See players through walls with bounding boxes, health bars, distance, and skeleton rendering.",
+    title: "ESP",
+    desc: "Boxes, health bars, player names, real-time previews.",
   },
   {
-    icon: Radar,
-    title: "2D Radar",
-    desc: "Mini-map overlay showing real-time enemy positions, direction, and movement patterns.",
+    icon: Crosshair,
+    title: "Aimbot",
+    desc: "Configurable aimbot with smoothness. Unsafe feature — must be enabled in settings.",
   },
   {
-    icon: Box,
-    title: "Item ESP",
-    desc: "Highlight loot, weapons, and key items on the map. Filter by rarity and category.",
+    icon: Moon,
+    title: "Nightmode",
+    desc: "Recoloring world materials (night mode).",
   },
   {
-    icon: ScanLine,
-    title: "No Recoil / No Spread",
-    desc: "Eliminate weapon recoil and bullet spread for laser-accurate sprays at any range.",
+    icon: Zap,
+    title: "Chams",
+    desc: "Highlighting player models through walls.",
   },
   {
-    icon: Orbit,
-    title: "Spoofer",
-    desc: "Hardware ID spoofer built-in. Clean bans and protect your machine identity automatically.",
+    icon: Move,
+    title: "Movement",
+    desc: "BunnyHop and other assists. Also requires enabling unsafe features.",
   },
 ];
 
