@@ -31,9 +31,7 @@ export default function Hero() {
 
       <div className="flex items-center gap-4 mt-10">
         <motion.a
-          href="https://cab.mozority.pro/p/cabinet"
-          target="_blank"
-          rel="noopener noreferrer"
+          href="#download"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...spring, delay: 0.6 }}
