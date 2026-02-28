@@ -1,37 +1,37 @@
 import { motion } from "framer-motion";
 import GlassContainer from "./GlassContainer";
-import { Zap, Eye, Lock, Cpu, Gauge, Layers } from "lucide-react";
+import { Crosshair, Eye, Radar, Box, ScanLine, Orbit } from "lucide-react";
 
 const features = [
   {
-    icon: Zap,
-    title: "Blazing Fast",
-    desc: "Optimized pipeline delivering sub-millisecond response times across all modules.",
+    icon: Crosshair,
+    title: "Aimbot",
+    desc: "Precision targeting with smooth, humanized aim assist. Configurable FOV, smoothing, and bone priority.",
   },
   {
     icon: Eye,
-    title: "Stealth Mode",
-    desc: "Completely invisible to detection layers with zero footprint technology.",
+    title: "ESP / Wallhack",
+    desc: "See players through walls with bounding boxes, health bars, distance, and skeleton rendering.",
   },
   {
-    icon: Lock,
-    title: "Encrypted Core",
-    desc: "Military-grade AES-256 encryption protects every data stream end-to-end.",
+    icon: Radar,
+    title: "2D Radar",
+    desc: "Mini-map overlay showing real-time enemy positions, direction, and movement patterns.",
   },
   {
-    icon: Cpu,
-    title: "Low Overhead",
-    desc: "Less than 1% CPU impact. Runs silently alongside your existing stack.",
+    icon: Box,
+    title: "Item ESP",
+    desc: "Highlight loot, weapons, and key items on the map. Filter by rarity and category.",
   },
   {
-    icon: Gauge,
-    title: "Real-time Metrics",
-    desc: "Live telemetry dashboard with granular performance analytics.",
+    icon: ScanLine,
+    title: "No Recoil / No Spread",
+    desc: "Eliminate weapon recoil and bullet spread for laser-accurate sprays at any range.",
   },
   {
-    icon: Layers,
-    title: "Modular Design",
-    desc: "Plug-and-play architecture. Enable only what you need, disable the rest.",
+    icon: Orbit,
+    title: "Spoofer",
+    desc: "Hardware ID spoofer built-in. Clean bans and protect your machine identity automatically.",
   },
 ];
 
@@ -54,7 +54,7 @@ export default function FeatureGrid() {
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
         className="text-3xl sm:text-4xl font-bold tracking-tight text-center mb-16 text-white/90"
       >
-        Built Different
+        Cheat Features
       </motion.h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
