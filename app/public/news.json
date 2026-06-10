@@ -1,0 +1,46 @@
+{
+  "news": [
+    {
+      "title": "Skins",
+      "date": "2026-06-10",
+      "tag": "warning",
+      "body": "Skins in the cheat will be temporarily unavailable."
+    },
+    {
+      "title": "v3.0.0 — Currently in Beta",
+      "date": "2026-06-10",
+      "tag": "update",
+      "body": "New version of mozority released! Currently available only for Beta users."
+    },
+    {
+      "title": "v2.1.0 — New skins added",
+      "date": "2026-02-22",
+      "tag": "update",
+      "body": "Added 15 new weapon skins from the latest CS2 case. Full sticker support is now available."
+    },
+    {
+      "title": "Server maintenance scheduled",
+      "date": "2026-02-20",
+      "tag": "warning",
+      "body": "Auth servers will be down on Feb 21, 03:00–05:00 UTC for maintenance. Injections during that window may fail."
+    },
+    {
+      "title": "Glove skins are here!",
+      "date": "2026-02-18",
+      "tag": "update",
+      "body": "Glove skin changer is now supported. Select your gloves in the inventory tab."
+    },
+    {
+      "title": "How to report bugs",
+      "date": "2026-02-15",
+      "tag": "info",
+      "body": "Use our Discord server #bug-reports channel. Include your loader version and a screenshot."
+    },
+    {
+      "title": "Welcome to mozority!",
+      "date": "2026-02-10",
+      "tag": "info",
+      "body": "Thank you for choosing mozority skinchanger. Stay tuned for updates!"
+    }
+  ]
+}
