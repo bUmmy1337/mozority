@@ -1,6 +1,12 @@
 {
   "news": [
     {
+      "title": "QoL Update",
+      "date": "2026-06-17",
+      "tag": "update",
+      "body": "New menu. New visual."
+    },
+    {
       "title": "Skins",
       "date": "2026-06-10",
       "tag": "warning",
